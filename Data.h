@@ -45,6 +45,8 @@ typedef struct Platform {
 //날짜 구조체
 typedef struct Day {
 	int day;
+	int wrongPassenger;
+	int GreatPassenger;
 	PassengerQueue* passengerQueue;
 	PlatformNode* platformList;
 }Day;
@@ -79,6 +81,9 @@ void enqueue(PassengerQueue *q, Passenger* data);
 
 //승객 큐 요소 빼기 함수
 Passenger* dequeue(PassengerQueue *q);
+
+//큐 출력 함수
+void printQueue(PassengerQueue* q);
 
 //승객 스택=================================================================================================
 typedef struct PassengerStack {
@@ -158,3 +163,6 @@ PlatformNode* deletePlatformLast(PlatformNode* head);
 
 //플랫폼 리스트에 해당 플랫폼 검색
 PlatformNode* searchPlatformList(PlatformNode* head, Platform* data);
+
+//플랫폼 리스트에 플랫폼 번호로 검색
+PlatformNode* searchPlatformListWithNum(PlatformNode* head, int data);

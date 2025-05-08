@@ -8,20 +8,41 @@ typedef struct Platform Platform;
 typedef struct Ticket Ticket;
 typedef struct Day Day;
 
+//커서 이동 함수
 void moveCursor(int row, int col);
 
+//배열로 저장된 아스키 아트 특정 위치 출력 함수
 void printAsciiArtAtLocation(int row, int col, const char* str);
 
+//티켓 생성 함수
 Ticket* creatTicket();
 
+//승객 생성 함수
 Passenger* createPassenger();
 
+//그 날의 num번 플랫폼을 찾아 역을 추가하는 함수
+void addStationToPlatform(Day* day, int num, const char* station);
+
+//역 리스트에 역 추가하는 함수
 StationNode* addStation(StationNode* list, const char* station);
 
+//num번호의 플랫폼 만드는 함수
 Platform* createPlatform(int num);
 
-void fillPassengerQueue(Day* day);
+//amount명의 승객을 큐에 채우는 함수
+void fillPassengerQueue(Day* day, int amount);
 
+//플랫폼 리스트의 플랫폼 개수를 세는 함수
 int countPlatformList(PlatformNode* p);
 
-Day nextDay(Day day);
+//다음날 함수
+void nextDay(Day* day);
+
+//모든 플랫폼 별 승객 스택을 검사하는 함수
+void checkPlatformPassenger(Day* day);
+
+//Day 초기화 함수
+void initDay(Day* day);
+
+//승객 메모리 청소 함수 (티켓 포함)
+void killPassenger(Passenger* passenger);

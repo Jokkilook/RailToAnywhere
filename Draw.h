@@ -18,4 +18,8 @@ void drawMainMenu();
 //게임 진행 그리는 함수
 void drawGame();
 
+//Day 넘어가기 전 통계 화면
 void drawDayOver(Day day);
+
+//일시 정지 화면
+void drawPause(int* isPlay);

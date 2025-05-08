@@ -11,7 +11,8 @@ void initQueue(PassengerQueue* q)
 
 //승객 큐 공백 확인 함수
 int isEmptyQueue(PassengerQueue *q) {
-	if (q->front == NULL && q->rear == NULL) return 1;
+	//if (q->front == NULL && q->rear == NULL) return 1;
+	if (q->front == NULL) return 1;
 	
 	return 0;
 }
@@ -38,7 +39,7 @@ Passenger* dequeue(PassengerQueue *q)
 	PassengerNode* temp = q->front;
 	Passenger* data;
 	if (isEmptyQueue(q)) {
-		exit(1);
+		return NULL;
 	}
 	else {
 		data = temp->data;
@@ -47,6 +48,23 @@ Passenger* dequeue(PassengerQueue *q)
 			q->rear = NULL;
 		free(temp);
 		return data;
+	}
+}
+
+//큐 출력 함수
+void printQueue(PassengerQueue* q) {
+	if (isEmptyQueue(q)) {
+		printf("[빈 큐]\n");
+		return;
+	}
+
+	PassengerNode* curr = q->front;
+	int index = 1;
+
+	while (curr != NULL) {
+		Passenger* p = curr->data;
+		printf("%d:%s ->", index++, p->ticket->destination);
+		curr = curr->link;
 	}
 }
 
@@ -76,7 +94,7 @@ void push(PassengerStack* s, Passenger* data)
 Passenger* pop(PassengerStack* s)
 {
 	if (isEmptyStack(s)) {
-		exit(1);
+		return NULL;
 	}
 	else {
 		PassengerNode* temp = s->top;
@@ -372,6 +390,21 @@ PlatformNode* searchPlatformList(PlatformNode* head, Platform* data)
 	PlatformNode* node = head->link;
 	do {
 		if (node->data == data) {
+			return node;
+		}
+		node = node->link;
+	} while (node != head->link);
+
+	return NULL;
+}
+
+PlatformNode* searchPlatformListWithNum(PlatformNode* head, int data)
+{
+	if (head == NULL) return NULL;
+
+	PlatformNode* node = head->link;
+	do {
+		if (node->data->num == data) {
 			return node;
 		}
 		node = node->link;

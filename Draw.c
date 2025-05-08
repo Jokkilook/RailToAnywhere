@@ -167,33 +167,17 @@ void drawGame() {
     int selected = 0;
     int optionsSize;
 
-    //승객 큐 생성
-    PassengerQueue* queue = (PassengerQueue *)malloc(sizeof(PassengerQueue));
-    Passenger* q = createPassenger();
-    initQueue(queue);
-    enqueue(queue, q);
-
-    //2개 플랫폼 생성
-    Platform* p = createPlatform(1);
-    Platform* p2 = createPlatform(2);
-
-    //플랫폼 리스트 생성
-    PlatformNode* platformList = NULL;
-
     //날 데이터 생성
-    Day day = {
-       0,
-       queue,
-       platformList
-    };
+    Day day;
+    initDay(&day);
+
+    addStationToPlatform(&day, 2, "멧돼지");
+
+    fillPassengerQueue(&day, 10);
 
     //현재 승객
     Passenger* passenger;
-
-    passenger = dequeue(queue);
-
-    day.platformList = insertPlatformLast(day.platformList, p);
-    day.platformList = insertPlatformLast(day.platformList, p2);
+    passenger = dequeue(day.passengerQueue);
 
     while (isPlay) {
 
@@ -227,6 +211,10 @@ void drawGame() {
             printf("   ☎  경찰서");
 
         //디버그 출력
+        moveCursor(0, 10);
+        printQueue(day.passengerQueue);
+        //moveCursor(1, 10);
+        //printf("PQ ADDRESS: %p\n", (void*)day.passengerQueue);
         //moveCursor(30, 0);
         //printf("SELECTED : %d\n", selected);
         //printf("1 : %d\n", day.platformList->link->data->num);
@@ -234,6 +222,7 @@ void drawGame() {
         //printf("3 : %d\n", day.platformList->link->link->link->data->num);
         //printf("4 : %d\n", day.platformList->link->link->link->link->data->num);
         //printPlatformList(day.platformList);
+
 
         //플레이어 입력 받기
         int key = _getch();
@@ -274,20 +263,117 @@ void drawGame() {
                 break;
             }
 
+            selected = 0;
+
             //승객 큐가 비었으면
-            if (isEmptyQueue(queue)) {
+            if (isEmptyQueue(day.passengerQueue)) {
+                //모든 플랫폼 별 승객 검사
+                checkPlatformPassenger(&day);
+                //Day 통계 화면 출력
+                drawDayOver(day);
                 //다음 날 시퀀스 작동
-                day = nextDay(day);
-                continue;
+                nextDay(&day);
             }
-            //남은 승객이 있으면 빼오기
-            else {
-                passenger = dequeue(queue);
-            }            
+            //다음 승객 빼오기
+            passenger = dequeue(day.passengerQueue);          
+        }        
+        //ESC 입력 시
+        else if (key == KEY_ESC) {
+            drawPause(&isPlay);
         }
     }   
 }
 
 void drawDayOver(Day day) {
+    system("cls");
     
+    //날짜 표시
+    moveCursor(10, 30);
+    printf("DAY %2d", day.day);
+
+    //잘 못 응대한 승객 수 표시
+    moveCursor(15, 30);
+    printf("잘 못 응대한 승객 수 : %d", day.wrongPassenger);
+
+    int key = _getch();
+}
+
+void drawPause(int* isPlay)
+{
+    const char* title[] = {
+      "  _____          __  __ ______   _____       _    _  _____ ______ ",
+      " / ____|   /\\   |  \\/  |  ____| |  __ \\ /\\  | |  | |/ ____|  ____|",
+      "| |  __   /  \\  | \\  / | |__    | |__) /  \\ | |  | | (___ | |__   ",
+      "| | |_ | / /\\ \\ | |\\/| |  __|   |  ___/ /\\ \\| |  | |\\___ \\|  __|  ",
+      "| |__| |/ ____ \\| |  | | |____  | |  / ____ \\ |__| |____) | |____ ",
+      " \\_____/_/    \\_\\_|  |_|______| |_| /_/    \\_\\____/|_____/|______|"
+    };
+
+    int isPause = 1;
+    int selected = 0;
+    int menuCount = 2;
+
+    const char* menus[] = {
+    "돌아가기",
+    "종료",
+    };
+
+
+    while (isPause) {
+        system("cls");
+
+        //PAUSE 타이틀 그리기
+        for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
+            printAsciiArtAtLocation(4 + i, 25, title[i]);
+        }
+
+        //안내 메시지
+        moveCursor(15, 37);
+        printf("지금 종료하면 모든 진행 상황을 잃게됩니다!");
+
+        //메뉴 박스 출력
+        drawBox(20, 50, 15, 6);
+
+        //메뉴 출력
+        for (int i = 0; i < 2; ++i) {
+            moveCursor(22 + i, 51);
+            if (i == selected)
+                printf("\033[01m > %s\033[0m\n", menus[i]);
+            else if (i == menuCount - 1)
+                printf("   %s", menus[i]);
+            else
+                printf("   %s\n", menus[i]);
+        }
+
+        //플레이어 입력 받기
+        int key = _getch();
+
+        if (key == KEY_ESC) {
+            isPause = 0;
+        }
+
+        //방향기 좌우 입력 시
+        if (key == 0 || key == 224) {
+            key = _getch();
+            switch (key) {
+                case KEY_UP:
+                    selected = (selected + 1) % menuCount;
+                    break;
+                case KEY_DOWN:
+                    selected = (selected - 1 + menuCount) % menuCount;
+                    break;
+            }
+        }
+        //엔터 입력 시
+        else if (key == KEY_ENTER) {
+            switch (selected) {
+            case 0:
+                isPause = 0;
+            case 1:
+                *isPlay = 0;
+                isPause = 0;
+                break;
+            }
+        }
+    }
 }
