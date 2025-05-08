@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 //사용된 자료구조
 //1. 구조체
