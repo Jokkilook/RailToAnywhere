@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-
 typedef struct Ticket Ticket;
 typedef struct Day Day;
+
 //문자 들어갈 네모 그리는 함수
 void drawBox(int row, int col, int width, int height);
 
@@ -23,3 +23,9 @@ void drawDayOver(Day day);
 
 //일시 정지 화면
 void drawPause(int* isPlay);
+
+//플랫폼 현황 화면
+void drawPlatformState(Day* day);
+
+//엔딩 화면
+void drawEnding(Day* day, int* isPlay);

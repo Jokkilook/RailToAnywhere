@@ -30,6 +30,7 @@ void drawBox(int row, int col, int width, int height) {
 
 }
 
+//특정 위치에 메시지 출력 후 ENTER 입력 대기
 void printStoryAndWait(int row, int col, const char* str) {
     moveCursor(row, col);
     printf("%s", str);
@@ -72,6 +73,7 @@ void drawTicket(Ticket ticket) {
     printf("%s", ticket.lastText);
 }
 
+//메인 메뉴 그리는 함수
 void drawMainMenu() {
 
     //타이틀 아스키
@@ -161,6 +163,7 @@ void drawMainMenu() {
     }
 }
 
+//게임 진행 그리는 함수
 void drawGame() {
 
     int isPlay = 1;
@@ -172,12 +175,15 @@ void drawGame() {
     initDay(&day);
 
     addStationToPlatform(&day, 2, "멧돼지");
+    addStationToPlatform(&day, 1, "고라니");
 
-    fillPassengerQueue(&day, 10);
+    fillPassengerQueue(&day, 5);
 
     //현재 승객
     Passenger* passenger;
     passenger = dequeue(day.passengerQueue);
+
+    drawPlatformState(&day);
 
     while (isPlay) {
 
@@ -212,6 +218,7 @@ void drawGame() {
 
         //디버그 출력
         moveCursor(0, 10);
+        printf("남은 승객 : ");
         printQueue(day.passengerQueue);
         //moveCursor(1, 10);
         //printf("PQ ADDRESS: %p\n", (void*)day.passengerQueue);
@@ -222,7 +229,6 @@ void drawGame() {
         //printf("3 : %d\n", day.platformList->link->link->link->data->num);
         //printf("4 : %d\n", day.platformList->link->link->link->link->data->num);
         //printPlatformList(day.platformList);
-
 
         //플레이어 입력 받기
         int key = _getch();
@@ -271,8 +277,17 @@ void drawGame() {
                 checkPlatformPassenger(&day);
                 //Day 통계 화면 출력
                 drawDayOver(day);
-                //다음 날 시퀀스 작동
-                nextDay(&day);
+                //마지막 근무일(30)이 아니면
+                if (day.day != 30) {
+                    //다음 날 시퀀스 작동
+                    nextDay(&day);
+                    //플랫폼 현황 화면 출력
+                    drawPlatformState(&day);
+                }
+                else {
+                    //게임 종료 시퀀스 작동
+                    drawEnding(&day, &isPlay);
+                }
             }
             //다음 승객 빼오기
             passenger = dequeue(day.passengerQueue);          
@@ -284,20 +299,30 @@ void drawGame() {
     }   
 }
 
+//Day 넘어가기 전 통계 화면
 void drawDayOver(Day day) {
+    //화면 초기화
     system("cls");
     
+    //통계 박스 그리기
+    drawBox(2, 0, 110, 20);
+
     //날짜 표시
-    moveCursor(10, 30);
+    moveCursor(5, 53);
     printf("DAY %2d", day.day);
 
     //잘 못 응대한 승객 수 표시
     moveCursor(15, 30);
     printf("잘 못 응대한 승객 수 : %d", day.wrongPassenger);
 
+    //다음날 메시지 출력
+    moveCursor(26, 51);
+    printf("> 다음날로");
+
     int key = _getch();
 }
 
+//일시 정지 화면
 void drawPause(int* isPlay)
 {
     const char* title[] = {
@@ -369,6 +394,7 @@ void drawPause(int* isPlay)
             switch (selected) {
             case 0:
                 isPause = 0;
+                break;
             case 1:
                 *isPlay = 0;
                 isPause = 0;
@@ -376,4 +402,49 @@ void drawPause(int* isPlay)
             }
         }
     }
+}
+
+//플랫폼 현황 화면
+void drawPlatformState(Day* day)
+{
+    //화면 초기화
+    system("cls");
+
+    //박스 그리기
+    drawBox(2, 0, 110, 20);
+
+    //플랫폼 현황판 타이틀 출력
+    moveCursor(5, 45);
+    printf("★ 플랫폼 별 노선도 ★");
+
+    //현재 플랫폼 출력
+    PlatformNode* current = day->platformList->link;
+    int index = 0;
+    do {
+        Platform* platform = current->data;
+
+        moveCursor(8 + index*3, 25);
+        printf("%d번 플랫폼 : ", platform->num);
+        printStationList(platform->stationList);
+
+        current = current->link;
+        index++;
+    } while (current != day->platformList->link);
+    
+
+    //다음날 메시지 출력
+    moveCursor(26, 30);
+    printf("> 근무 시작");
+
+    int key = _getch();
+}
+
+//엔딩 화면
+void drawEnding(Day* day, int* isPlay)
+{
+    system("cls");
+    printf("수고했네");
+    int key = _getch();
+
+    *isPlay = 0;
 }

@@ -54,7 +54,7 @@ Passenger* dequeue(PassengerQueue *q)
 //큐 출력 함수
 void printQueue(PassengerQueue* q) {
 	if (isEmptyQueue(q)) {
-		printf("[빈 큐]\n");
+		printf("");
 		return;
 	}
 
@@ -63,7 +63,7 @@ void printQueue(PassengerQueue* q) {
 
 	while (curr != NULL) {
 		Passenger* p = curr->data;
-		printf("%d:%s ->", index++, p->ticket->destination);
+		printf("■ ", index++, p->ticket->destination);
 		curr = curr->link;
 	}
 }
@@ -115,7 +115,10 @@ void printStationList(StationNode* head)
 	}
 	p = head->link;
 	do {
-		printf("%s -> ", p->data);
+		printf("%s", p->data);
+		if (p->link != head->link) {
+			printf(" -> ");
+		}
 		p = p->link;
 	} while (p != head->link);
 }

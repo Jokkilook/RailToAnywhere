@@ -14,6 +14,9 @@ void moveCursor(int row, int col);
 //배열로 저장된 아스키 아트 특정 위치 출력 함수
 void printAsciiArtAtLocation(int row, int col, const char* str);
 
+//에러 메시지 출력
+void printError(const char* str);
+
 //티켓 생성 함수
 Ticket* creatTicket();
 
@@ -46,3 +49,6 @@ void initDay(Day* day);
 
 //승객 메모리 청소 함수 (티켓 포함)
 void killPassenger(Passenger* passenger);
+
+//플랫폼 번호로 해당 플랫폼 2개의 역 리스트를 교환하는 함수
+void exchangeStationListWithNum(PlatformNode* platformList, int num1, int num2);

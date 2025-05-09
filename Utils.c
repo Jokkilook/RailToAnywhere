@@ -1,6 +1,8 @@
 ﻿#include "Utils.h"
 #include "Data.h"
 #include <stdlib.h>
+#include <time.h>
+#include <conio.h>
 
 static const char* paint[6] = {
 	"       _____                 . . . . . o o o o o",
@@ -11,6 +13,57 @@ static const char* paint[6] = {
 	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 };
 
+static const char* wrongPaint[6][6] = {
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	},
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	},
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	},
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	},
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	},
+	{
+	"       _____                 . . . . . o o o o o",
+	"     __|[_]|__ ___________ _______    ____      o",
+	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
+	"   _|________|_[_________]_[________]_|__|________)<",
+	"     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
+	"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+	}
+};
+
 void moveCursor(int row, int col) {
 	printf("\033[%d;%dH", row, col);
 }
@@ -19,11 +72,19 @@ void printAsciiArtAtLocation(int row, int col, const char* str) {
 	printf("\033[%d;%dH%s", row, col, str);
 }
 
+void printError(const char* str)
+{
+	moveCursor(40, 0);
+	printf("\033[1;31m%s\033[0m", str);
+	int key = _getch();
+}
+
 Ticket* creatTicket()
 {
 	//티켓 메모리 할당
 	Ticket* t = (Ticket*)malloc(sizeof(Ticket));
-	t->isWrong = 0;
+	srand(time(NULL));
+	t->isWrong = rand() % 1;
 	t->destination = "멧돼지";
 	t->lastText = "ANYWHERE";
 	t->num = t->subNum = 0;
@@ -110,24 +171,76 @@ void nextDay(Day* day)
 	//날짜 ++
 	day->day++;
 
-	fillPassengerQueue(day, 10);
-	
-	//7, 14일 째에 플랫폼 증설
-	switch (day->day)
-	{
-	case 7: {
+	//대기 승객 큐에 승객 채우기
+	if (0 <= day->day && day->day <= 3) {
+		fillPassengerQueue(day, 5);
+		//1,2 플랫폼에 역 2개씩 추가
+		addStationToPlatform(day, 1, "조끼룩");
+		addStationToPlatform(day, 1, "오끼악");
+		addStationToPlatform(day, 2, "미리내");
+		addStationToPlatform(day, 2, "미리암");
+	}
+	else if (4 <= day->day && day->day <= 6) {
+		fillPassengerQueue(day, 2 + day->day);
+	}
+	else if (day->day == 7) {
+		fillPassengerQueue(day, 8);
+		//3번 플랫폼 추가
+		Platform* p = createPlatform(3);
+		day->platformList = insertPlatformLast(day->platformList, p);
+		//3번 플랫폼에 역 추가
+		addStationToPlatform(day, 3, "꼬끼오");
+	}
+	else if (7 < day->day && day->day <= 9) {
+		fillPassengerQueue(day, 8);
+		//3번 플랫폼에 역 추가
+		addStationToPlatform(day, 3, "꼬끼오");
+		addStationToPlatform(day, 3, "훌리우");
+	}
+	else if (10 <= day->day && day->day <= 13) {
+		fillPassengerQueue(day, day->day - 1);
+	}
+	else if (day->day == 14) {
+		fillPassengerQueue(day, 12);
+		//4번 플랫폼 추가
+		Platform* p = createPlatform(4);
+		day->platformList = insertPlatformLast(day->platformList, p);
+		//4번 플랫폼에 역 추가
+		addStationToPlatform(day, 4, "옴멤메");
+	}
+	else if (14 < day->day && day->day <= 16) {
+		fillPassengerQueue(day, 12);
+		//4번 플랫폼에 역 추가
+		addStationToPlatform(day, 4, "뽀꾸뿌");
+		addStationToPlatform(day, 4, "키티닝");
+	}
+	else if (17 <= day->day && day->day <= 20) {
+		fillPassengerQueue(day, day->day - 4);
+	}
+	else if (day->day == 21) {
+		fillPassengerQueue(day, 16);
+		//플랫폼 1,3의 역 리스트 교환
+		exchangeStationListWithNum(day->platformList, 1, 3);
+	}
+	else if (22 <= day->day && day->day <= 23) {
+		fillPassengerQueue(day, day->day - 5);
+	}
+	else if (day->day == 24) {
+		fillPassengerQueue(day, 18);
+		//플랫폼 2,4의 역 리스트 교환
+		exchangeStationListWithNum(day->platformList, 2, 4);
+	}
+	else if (25 <= day->day && day->day <= 29) {
+		fillPassengerQueue(day, day->day - 6);
+	}
+	else if (day->day == 30) {
+		fillPassengerQueue(day, 48);
+		//플랫폼 1,4 / 2,3 역 리스트 교환
+		exchangeStationListWithNum(day->platformList, 1, 4);
+		exchangeStationListWithNum(day->platformList, 2, 3);
+	}
 
-		Platform* p3 = createPlatform(3);
-		day->platformList = insertPlatformLast(day->platformList, p3);
-		break;
-	}
-	case 14: {
-		Platform* p4 = createPlatform(4);
-		day->platformList = insertPlatformLast(day->platformList, p4);
-	}
-	default:
-		break;
-	}
+	int key = _getch();
 }
 
 void checkPlatformPassenger(Day* day)
@@ -184,18 +297,37 @@ void initDay(Day* day)
 	Platform* p = createPlatform(1);
 	Platform* p2 = createPlatform(2);
 
-	day->day = 0;
+	//day값 할당
+	day->day = 1;
 	day->wrongPassenger = 0;
 	day->GreatPassenger = 0;
 	day->passengerQueue = queue;
 	day->platformList = platformList;
 
+	//기본 플랫폼 2개 추가
 	day->platformList = insertPlatformLast(day->platformList, p);
 	day->platformList = insertPlatformLast(day->platformList, p2);
 }
 
 void killPassenger(Passenger* passenger)
 {
+	//티켓 메모리 해제
 	free(passenger->ticket);
+	//승객 메모리 해제
 	free(passenger);
+}
+
+void exchangeStationListWithNum(PlatformNode* platformList, int num1, int num2)
+{
+	//해당 번호의 플랫폼 2개
+	Platform* platform1 = searchPlatformListWithNum(platformList, num1)->data;
+	Platform* platform2 = searchPlatformListWithNum(platformList, num2)->data;
+
+	//바꿀 플랫폼의 역 리스트
+	StationNode* tempList = platform1->stationList;
+
+	//맞교환
+	platform1->stationList = platform2->stationList;
+	platform2->stationList = tempList;
+	//printError("교환함");
 }
