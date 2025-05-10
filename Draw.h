@@ -10,7 +10,7 @@ void drawBox(int row, int col, int width, int height);
 void printStoryAndWait(int row, int col, const char* str);
 
 //티켓 그리는 함수
-void drawTicket(Ticket ticket);
+void drawTicket(Ticket ticket, int highlight);
 
 //메인 메뉴 그리는 함수
 void drawMainMenu();
@@ -19,7 +19,7 @@ void drawMainMenu();
 void drawGame();
 
 //Day 넘어가기 전 통계 화면
-void drawDayOver(Day day);
+void drawDayOver(Day day, int* isPlay);
 
 //일시 정지 화면
 void drawPause(int* isPlay);
@@ -28,4 +28,7 @@ void drawPause(int* isPlay);
 void drawPlatformState(Day* day);
 
 //엔딩 화면
-void drawEnding(Day* day, int* isPlay);
+void drawEnding(Day* day);
+
+//튜토리얼 시퀀스
+void drawTutorial();

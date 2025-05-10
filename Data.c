@@ -117,7 +117,7 @@ void printStationList(StationNode* head)
 	do {
 		printf("%s", p->data);
 		if (p->link != head->link) {
-			printf(" -> ");
+			printf(" - ");
 		}
 		p = p->link;
 	} while (p != head->link);
@@ -414,4 +414,41 @@ PlatformNode* searchPlatformListWithNum(PlatformNode* head, int data)
 	} while (node != head->link);
 
 	return NULL;
+}
+
+//승객 스택 초기화
+void initStationStack(StationStack* s)
+{
+	s->top = NULL;
+}
+
+//승객 스택 공백 확인 함수
+int isEmptyStationStack(StationStack* s)
+{
+	if (s->top == NULL) return 1;
+	return 0;
+}
+
+//승객 스택 요소 추가 함수
+void pushStation(StationStack* s, const char* data)
+{
+	StationNode* temp = (StationNode*)malloc(sizeof(StationNode));
+	temp->data = data;
+	temp->link = s->top;
+	s->top = temp;
+}
+
+//승객 스택 요소 빼기 함수
+const char* popStation(StationStack* s)
+{
+	if (isEmptyStationStack(s)) {
+		return NULL;
+	}
+	else {
+		PassengerNode* temp = s->top;
+		Passenger* data = temp->data;
+		s->top = s->top->link;
+		free(temp);
+		return data;
+	}
 }

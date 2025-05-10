@@ -18,10 +18,13 @@ void printAsciiArtAtLocation(int row, int col, const char* str);
 void printError(const char* str);
 
 //티켓 생성 함수
-Ticket* creatTicket();
+Ticket* createTicket(Day* day);
+
+//튜토리얼용 티켓 생성 함수
+Ticket createTutTicket(int isWrong);
 
 //승객 생성 함수
-Passenger* createPassenger();
+Passenger* createPassenger(Day* day);
 
 //그 날의 num번 플랫폼을 찾아 역을 추가하는 함수
 void addStationToPlatform(Day* day, int num, const char* station);
@@ -52,3 +55,12 @@ void killPassenger(Passenger* passenger);
 
 //플랫폼 번호로 해당 플랫폼 2개의 역 리스트를 교환하는 함수
 void exchangeStationListWithNum(PlatformNode* platformList, int num1, int num2);
+
+//Day의 플랫폼들의 역 리스트 중 역 하나를 뽑는 함수
+const char* getRandomStation(Day* day);
+
+//역 이름 스택 초기화
+void settingStation();
+
+//해당 플랫폼에 저장된 역 이름 하나 가져오기
+const char* getStationFromPlatform(int num);
