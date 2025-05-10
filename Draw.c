@@ -130,7 +130,7 @@ void drawMainMenu() {
         for (int i = 0; i < 3; ++i) {
             moveCursor(22 + i, 51);
             if (i == selected)
-                printf("\033[01m > %s\033[0m\n", menus[i]);
+                printf("\033[01;33m > %s\033[0m\n", menus[i]);
             else if (i == menuCount - 1)
                 printf("   %s", menus[i]);
             else
@@ -350,11 +350,9 @@ void drawGame() {
             default:
                 //경찰서 신고 (위조 티켓)
                 if (passenger->ticket->isWrong) {
-                    printError("훌륭한 신고");
                 }
                 //위조 티켓아닌데 신고한거면
                 else {
-                    printError("아닌데 신고했대요~");
                     day.wrongPassenger++;
                 }
                 killPassenger(passenger);
@@ -463,7 +461,7 @@ void drawDayOver(Day day, int* isPlay) {
 
     //다음날 메시지 출력
     moveCursor(26, 48);
-    printf("> %s", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
+    printf("\033[1;33m> %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
 
     int key = _getch();
 }
@@ -509,7 +507,7 @@ void drawPause(int* isPlay)
         for (int i = 0; i < 2; ++i) {
             moveCursor(22 + i, 51);
             if (i == selected)
-                printf("\033[01m > %s\033[0m\n", menus[i]);
+                printf("\033[01;33m > %s\033[0m\n", menus[i]);
             else if (i == menuCount - 1)
                 printf("   %s", menus[i]);
             else
@@ -625,7 +623,7 @@ void drawPlatformState(Day* day)
     
     //다음날 메시지 출력
     moveCursor(26, 48);
-    printf("> 근무 시작");
+    printf("\033[1;33m> 근무 시작\033[0m");
 
     int key = _getch();
 }
@@ -862,10 +860,10 @@ void drawInfo()
         printf("당신의 주요 임무는 승객의 요구를 듣고 표를 검사하여 \033[1;31m알맞은 플랫폼\033[0m으로 안내하는 것입니다.");
         moveCursor(17, 28);
         printf("승객을 \033[1;31m이상한 플랫폼\033[0m으로 안내하면 일자리를 잃게될 수도 있습니다..");
-        moveCursor(19, 38);
-        printf("표 중에는 \033[1;31m위조표\033[0m도 있어, 주의하여야합니다!");
+        moveCursor(19, 6);
+        printf("표 중에는 \033[1;31m위조표\033[0m도 있어, 주의하여야합니다! \033[1;32m위조표 종류 [ 철자 오류, 순서 불일치, 숫자 불일치, 그림 변화 ]\033[0m");
         moveCursor(21, 39);
-        printf("과연 실수없이 일자리를 지킬 수 있을까요?");
+        printf("\033[1m과연 실수없이 일자리를 지킬 수 있을까요?\033[0m");
 
         //조작법 출력
         moveCursor(24, 2);
