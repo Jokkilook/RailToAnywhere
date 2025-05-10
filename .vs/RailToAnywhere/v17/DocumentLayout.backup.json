@@ -7,20 +7,8 @@
       "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Draw.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Utils.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Utils.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Data.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Data.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Draw.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Draw.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Data.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -29,6 +17,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:main.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Utils.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Utils.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Data.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Data.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|E:\\GitHub\\RailToAnywhere\\Utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{F278DC1E-E855-4E0C-A2C3-B2226F9FD057}|RailToAnywhere.vcxproj|solutionrelative:Utils.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -42,13 +42,13 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "Utils.c",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\Utils.c",
               "RelativeDocumentMoniker": "Utils.c",
               "ToolTip": "E:\\GitHub\\RailToAnywhere\\Utils.c",
               "RelativeToolTip": "Utils.c",
-              "ViewState": "AgIAAJgAAAAAAAAAAAAlwLQAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAANoAAAAAAAAAAAAlwLUAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2025-05-05T07:50:52.396Z",
               "EditorCaption": ""
@@ -61,14 +61,14 @@
               "RelativeDocumentMoniker": "Draw.c",
               "ToolTip": "E:\\GitHub\\RailToAnywhere\\Draw.c",
               "RelativeToolTip": "Draw.c",
-              "ViewState": "AgIAAKwBAAAAAAAAAAAlwL8BAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAAPYCAAAAAAAAAAAAwAQDAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2025-05-05T07:43:25.664Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 2,
               "Title": "Data.c",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\Data.c",
               "RelativeDocumentMoniker": "Data.c",
@@ -81,13 +81,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
               "Title": "main.c",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\main.c",
               "RelativeDocumentMoniker": "main.c",
               "ToolTip": "E:\\GitHub\\RailToAnywhere\\main.c",
               "RelativeToolTip": "main.c",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAARAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
               "WhenOpened": "2025-05-05T07:42:34.588Z",
               "EditorCaption": ""
@@ -96,24 +96,24 @@
         },
         {
           "DockedWidth": 196,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "Draw.h",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\Draw.h",
               "RelativeDocumentMoniker": "Draw.h",
               "ToolTip": "E:\\GitHub\\RailToAnywhere\\Draw.h",
               "RelativeToolTip": "Draw.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAwA4AAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-05-05T07:43:31.054Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "Utils.h",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\Utils.h",
               "RelativeDocumentMoniker": "Utils.h",
@@ -121,18 +121,17 @@
               "RelativeToolTip": "Utils.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-05-05T07:50:58.042Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-05T07:50:58.042Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Data.h",
               "DocumentMoniker": "E:\\GitHub\\RailToAnywhere\\Data.h",
               "RelativeDocumentMoniker": "Data.h",
               "ToolTip": "E:\\GitHub\\RailToAnywhere\\Data.h",
               "RelativeToolTip": "Data.h",
-              "ViewState": "AgIAABcAAAAAAAAAAAAlwCUAAAALAAAAAAAAAA==",
+              "ViewState": "AgIAABcAAAAAAAAAAAAlwDQAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-05-05T07:55:01.733Z",
               "EditorCaption": ""

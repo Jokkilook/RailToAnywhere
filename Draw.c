@@ -111,9 +111,11 @@ void drawMainMenu() {
     while (menu) {
         system("cls");
 
+        drawBox(1, 0, 115, 50);
+
         //로고 타이틀 그리기
         for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
-            printAsciiArtAtLocation(4 + i, 10, title[i]);
+            printAsciiArtAtLocation(3 + i, 10, title[i]);
         }
 
         //로고 그림 그리기
@@ -135,7 +137,7 @@ void drawMainMenu() {
                 printf("   %s\n", menus[i]);
         }
 
-        moveCursor(25, 0);
+        moveCursor(24, 62);
 
         int key = _getch();
 
@@ -156,10 +158,10 @@ void drawMainMenu() {
                 drawGame();
                 break;
             case 1:
-                printf("게임 정보");
+                drawInfo();
                 break;
             case 2:
-                menu = 0;
+                exit(0);
                 break;
             }
         }
@@ -208,7 +210,7 @@ void drawGame() {
 
         //날짜 표시
         moveCursor(0, 2);
-        printf("DAY %d", day.day);
+        printf("\033[1;34mDAY %d\033[0m", day.day);
 
         //티켓 그리기
         drawTicket(*passenger->ticket, 0);
@@ -223,7 +225,7 @@ void drawGame() {
         PlatformNode* p = day.platformList->link;
         do {
             if (p->data->num - 1 == selected)
-                printf("\033[01m > %d번 플랫폼\033[0m", p->data->num);
+                printf("\033[1;33m > %d번 플랫폼\033[0m", p->data->num);
             else
                 printf("   %d번 플랫폼", p->data->num);
             p = p->link;
@@ -231,14 +233,14 @@ void drawGame() {
 
         //되묻기 출력
         if (selected == optionsSize)
-            printf(" > 네?");
+            printf("\033[1;33m > 네?\033[0m");
         else
             printf("   네?");
         
         //경찰서 출력
         moveCursor(28, 0);
         if (selected > optionsSize || selected < 0)
-            printf("\033[01m > ☎  경찰서\033[0m");
+            printf("\033[1;31m > ☎  경찰서\033[0m");
         else
             printf("   ☎  경찰서");
 
@@ -348,9 +350,11 @@ void drawGame() {
             default:
                 //경찰서 신고 (위조 티켓)
                 if (passenger->ticket->isWrong) {
+                    printError("훌륭한 신고");
                 }
                 //위조 티켓아닌데 신고한거면
                 else {
+                    printError("아닌데 신고했대요~");
                     day.wrongPassenger++;
                 }
                 killPassenger(passenger);
@@ -666,6 +670,7 @@ void drawEnding(Day* day)
     int key = _getch();
 }
 
+//튜토리얼 시퀀스
 void drawTutorial()
 {
     int isTutorial = 1;
@@ -683,7 +688,7 @@ void drawTutorial()
 
         //날짜 표시
         moveCursor(0, 2);
-        printf("수습 기간");
+        printf("\033[1;34m수습 기간\033[0m");
 
         //티켓 발행
         Ticket t;
@@ -698,6 +703,7 @@ void drawTutorial()
         if (!completePolice) {
             if (!police) {
                 if (!duringPlatform) {
+                    duringPlatform = 1;
                     moveCursor(18, 2);
                     printf("어서오게! 여기가 자네가 일하게 될 역이라네.");
                     _getch();
@@ -715,8 +721,10 @@ void drawTutorial()
                     moveCursor(18, 2);
                     printf("어서오게! 여기가 자네가 일하게 될 역이라네.");
                     moveCursor(20, 2);
-                    printf("자네가 할 일은 승객의 티켓을 확인하고 플랫폼을 안내해주는 일이네!");
+                    printf("우리 기차는 표만 있으면 어디든 갈 수 있지. 하지만 표에 어느 플랫폼인지가 안 써있네. 다 자네한테 물어보러 온다고.");
                     moveCursor(22, 2);
+                    printf("자네가 할 일은 승객의 티켓을 확인하고 플랫폼을 안내해주는 일이네!");
+                    moveCursor(24, 2);
                     printf("여기 이 손님은 %s에 가고싶어 하는군. %s은 \033[1;31m1번 플랫폼\033[0m이네 그 곳으로 안내해드리게",t.destination, t.destination);
                 }
             }
@@ -746,7 +754,7 @@ void drawTutorial()
                     moveCursor(22, 2);
                     printf("만약 지금 보여주는 표처럼 어딘가 이상한 표라면 경찰서에 연락을 해야하네!");
                     moveCursor(23, 2);
-                    printf("\033[1;32m※ 위조표는 표의 순서가 다르거나, 오른쪽 왼쪽 숫자가 다르거나, 그림이 이상하거나, 좌측 하단 문자가 이상합니다. ※\033[0m");
+                    printf("\033[1;32m※ 위조표는 표의 순서가 다르거나, 상단 오른쪽 왼쪽 숫자가 다르거나, 그림이 이상하거나, 좌측 하단 문자가 이상합니다. ※\033[0m");
                     if (policeNotice) {
                         moveCursor(24, 2);
                         printf("플랫폼을 안내하는 게 아니라, \033[1;31m경찰서\033[0m에 전화해야 하네!");
@@ -756,13 +764,13 @@ void drawTutorial()
         }
         else {
             moveCursor(18, 2);
-            printf("일을 잘 이해하는 군! 앞으로의 모습이 기대되네");
+            printf("일을 잘 이해하는군! 앞으로의 모습이 기대되네");
             _getch();
             moveCursor(20, 2);
             printf("앞으로도 승객의 말을 잘 듣고 정확히 안내해주길 바라네");
             _getch();
             moveCursor(22, 2);
-            printf("위조표가 아닌 정상표를 다시 한번 보여주겠네!");
+            printf("위조표가 아닌 \033[01;31m정상표\033[0m를 다시 한번 보여주겠네!");
             _getch();
             moveCursor(24, 2);
             printf("위조표를 들고오는 범죄자는 즉시 경찰서에 연락하게!");
@@ -773,7 +781,7 @@ void drawTutorial()
         //선택지 출력
         moveCursor(26, 0);
         if (selected == 0)
-            printf(" > 1번 플랫폼");
+            printf("\033[01;33m > 1번 플랫폼\033[0m");
         else
             printf("   1번 플랫폼");
 
@@ -781,7 +789,7 @@ void drawTutorial()
         if (police) {
             moveCursor(28, 0);
             if (selected > 0 || selected < 0)
-                printf("\033[01m > ☎  경찰서\033[0m");
+                printf("\033[01;31m > ☎  경찰서\033[0m");
             else
                 printf("   ☎  경찰서");
         }
@@ -816,6 +824,61 @@ void drawTutorial()
                 break;
             }
 
+        }
+    }
+}
+
+//게임 정보 화면
+void drawInfo()
+{
+    int info = 1;
+
+    //타이틀 아스키
+    const char* title[] = {
+    " ____      _    ___ _       _____ ___       _    _   ___   ____        ___   _ _____ ____  _____ ",
+    "|  _ \\    / \\  |_ _| |     |_   _/ _ \\     / \\  | \\ | \\ \\ / /\\ \\      / / | | | ____|  _ \\| ____|",
+    "| |_) |  / _ \\  | || |       | || | | |   / _ \\ |  \\| |\\ V /  \\ \\ /\\ / /| |_| |  _| | |_) |  _|  ",
+    "|  _ <  / ___ \\ | || |___    | || |_| |  / ___ \\| |\\  | | |    \\ V  V / |  _  | |___|  _ <| |___ ",
+    "|_| \\_\\/_/   \\_\\___|_____|   |_| \\___/  /_/   \\_\\_| \\_| |_|     \\_/\\_/  |_| |_|_____|_| \\_\\_____|"
+    };
+
+    while (info) {
+        system("cls");
+
+        drawBox(1, 0, 115, 50);
+
+        //로고 타이틀 그리기
+        for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
+            printAsciiArtAtLocation(3 + i, 10, title[i]);
+        }
+
+        //게임 정보 출력
+        moveCursor(10, 2);
+        printf("================================================== \033[1;34m게임 정보\033[0m ====================================================");
+        
+        moveCursor(13, 37);
+        printf("당신은 한 기차역의 검표원으로 고용되었습니다!");
+        moveCursor(15, 16);
+        printf("당신의 주요 임무는 승객의 요구를 듣고 표를 검사하여 \033[1;31m알맞은 플랫폼\033[0m으로 안내하는 것입니다.");
+        moveCursor(17, 28);
+        printf("승객을 \033[1;31m이상한 플랫폼\033[0m으로 안내하면 일자리를 잃게될 수도 있습니다..");
+        moveCursor(19, 38);
+        printf("표 중에는 \033[1;31m위조표\033[0m도 있어, 주의하여야합니다!");
+        moveCursor(21, 39);
+        printf("과연 실수없이 일자리를 지킬 수 있을까요?");
+
+        //조작법 출력
+        moveCursor(24, 2);
+        printf("================================================== \033[1;34m조작 방법\033[0m ====================================================");
+        moveCursor(27, 40);
+        printf("\033[1;32m←, →, ↑, ↓ : 고르기 | Enter : 선택\033[0m");
+
+        moveCursor(30, 39);
+        printf("\033[1m ESC를 누르면 메인 메뉴로 돌아갑니다. \033[0m");
+
+        int key = _getch();
+        if (key == KEY_ESC) {
+            info = 0;
         }
     }
 }

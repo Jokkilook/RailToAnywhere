@@ -178,6 +178,8 @@ void nextDay(Day* day)
 {
 	//날짜 ++
 	day->day++;
+	day->wrongPassenger = 0;
+	day->greatPassenger = 0;
 
 	//0~3일째
 	if (0 <= day->day && day->day <= 3) {
@@ -312,7 +314,7 @@ void checkPlatformPassenger(Day* day)
 
 	} while (currentPlatform!=platformList->link);
 
-	day->wrongPassenger = wrongPassenger;
+	day->wrongPassenger += wrongPassenger;
 }
 
 void initDay(Day* day)

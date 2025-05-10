@@ -32,3 +32,6 @@ void drawEnding(Day* day);
 
 //튜토리얼 시퀀스
 void drawTutorial();
+
+//게임 정보 화면
+void drawInfo();
