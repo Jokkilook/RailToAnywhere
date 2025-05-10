@@ -35,3 +35,6 @@ void drawTutorial();
 
 //게임 정보 화면
 void drawInfo();
+
+//정상표 확인 화면
+void drawNormalTicketCheck();

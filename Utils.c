@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
+#include <string.h>
 
 StationStack* platform1;
 StationStack* platform2;
@@ -20,6 +21,8 @@ void printAsciiArtAtLocation(int row, int col, const char* str) {
 void printError(const char* str)
 {
 	moveCursor(40, 0);
+	printf("                                                                          ");
+	moveCursor(40, 0);
 	printf("\033[1;31m%s\033[0m", str);
 	int key = _getch();
 }
@@ -36,7 +39,7 @@ Ticket* createTicket(Day* day)
 
 	//식별 정보 추가
 	t->lastText = "ANYWHERE";
-	t->num = t->subNum = day->totalPassengerCount;
+	t->num = t->subNum = day->ticketCount++;
 	day->totalPassengerCount++;
 	for (int i = 0; i < 6; i++) {
 		t->paint[i] = paint[i];
@@ -71,8 +74,8 @@ Ticket createTutTicket(int isWrong)
 {
 	Ticket ticket = {
 		isWrong,
-		isWrong ? 23: 0,
-		0,
+		isWrong ? rand() % 30 : 0,
+		isWrong ? rand() % 30 : 0,
 		"서울역",
 		{"","","","","",""},
 		isWrong ? wrongLastText[rand() % 6] : "ANYWHERE"
@@ -99,17 +102,7 @@ Passenger* createPassenger(Day* day)
 	Passenger* p = (Passenger*)malloc(sizeof(Passenger));
 
 	p->ticket = createTicket(day);
-	 
-	const char* list[4] = {
-		"나 %s 가고싶엉",
-		"%s 라니까용",
-		"아니..하.....",
-		"꺼지쇼"
-	};
-
-	for (int i = 0; i < 4; i++) {
-		p->dialogue[i] = list[i];
-	}
+	p->dialogue = createPassengerDialogue();
 
 	return p;
 }
@@ -180,6 +173,7 @@ void nextDay(Day* day)
 	day->day++;
 	day->wrongPassenger = 0;
 	day->greatPassenger = 0;
+	day->ticketCount = 1;
 
 	//0~3일째
 	if (0 <= day->day && day->day <= 3) {
@@ -299,10 +293,16 @@ void checkPlatformPassenger(Day* day)
 			//승객의 목적지
 			const char* passengerDestination = passenger->ticket->destination;
 
-			//승객의 목적지가 해당 플랫폼 목적지 리스트에 없으면 ++
+			//승객의 목적지가 해당 플랫폼 목적지 리스트에 없거나 위조표면 잘못 응대 ++
 			if (!searchStationList(stationList, passengerDestination)||passenger->ticket->isWrong) {
 				wrongPassenger++;
 			}
+			//승객의 목적지가 해당 플랫폼 목적지에 있거나 위조표가 아니면
+			else {
+				//한번에 안내한 승객이면 훌륭 응대 ++
+				if (checkFirstComplete(passenger)) day->greatPassenger++;
+			}
+
 			//평가 끝난 승객은 메모리 해제 (티켓 포함)
 			killPassenger(passenger);
 			//다음 승객 뽑아 오기
@@ -334,10 +334,11 @@ void initDay(Day* day)
 	day->day = 1;
 	day->wrongPassenger = 0;
 	day->greatPassenger = 0;
-	day->totalPassengerCount = 1;
+	day->totalPassengerCount = 0;
 	day->totalGreatCount = 0;
 	day->totalWrongCount = 0;
 	day->wrongDayCount = 0;
+	day->ticketCount = 1;
 	day->passengerQueue = queue;
 	day->platformList = platformList;
 
@@ -418,35 +419,64 @@ void settingStation()
 	platform3 = (StationStack*)malloc(sizeof(StationStack));
 	platform4 = (StationStack*)malloc(sizeof(StationStack));
 
-	initStack(platform1);
-	initStack(platform2);
-	initStack(platform3);
-	initStack(platform4);
+	initStationStack(platform1);
+	initStationStack(platform2);
+	initStationStack(platform3);
+	initStationStack(platform4);
 
 	for (int i = 4; i >= 0; i--) {
-		push(platform1, stationNames[0][i]);
-		push(platform2, stationNames[1][i]);
-		push(platform3, stationNames[2][i]);
-		push(platform4, stationNames[3][i]);
+		pushStation(platform1, stationNames[0][i]);
+		pushStation(platform2, stationNames[1][i]);
+		pushStation(platform3, stationNames[2][i]);
+		pushStation(platform4, stationNames[3][i]);
 	}
 }
 
 const char* getStationFromPlatform(int num) {
 	switch (num) {
 	case 1:
-		return pop(platform1);
+		return popStation(platform1);
 		break;
 	case 2:
-		return pop(platform2);
+		return popStation(platform2);
 		break;
 	case 3:
-		return pop(platform3);
+		return popStation(platform3);
 		break;
 	case 4:
-		return pop(platform4);
+		return popStation(platform4);
 		break;
 	default:
 		return "NONE";
 		break;
 	}
+}
+
+DialogueQueue* createPassengerDialogue()
+{
+	DialogueQueue* q = (DialogueQueue*)malloc(sizeof(DialogueQueue));
+	initDialogueQueue(q);
+
+	int i = rand() % DIALOGUE_SIZE;
+	enqueueDialogue(q, firstDialogue[i]);
+	i = rand() % DIALOGUE_SIZE;
+	enqueueDialogue(q, secondDialogue[i]);
+	i = rand() % DIALOGUE_SIZE;
+	enqueueDialogue(q, thirdDialogue[i]);
+
+	return q;
+}
+
+int checkFirstComplete(Passenger* passenger)
+{
+	const char* target = dequeueDialogue(passenger->dialogue);
+
+	if (target) {
+		for (int i = 0; i < DIALOGUE_SIZE; i++) {
+			if (strcmp(target, secondDialogue[i]) == 0) {
+				return 1;
+			}
+		}
+	}
+	return 0;
 }

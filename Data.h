@@ -14,12 +14,16 @@
 #define KEY_RIGHT 77
 #define KEY_ENTER 13
 #define KEY_ESC 27
+#define KEY_TAB 9
+
+#define DIALOGUE_SIZE 20
 
 typedef struct PassengerQueue PassengerQueue;
 typedef struct PassengerStack PassengerStack;
 typedef struct StationNode StationNode;
 typedef struct PlatformList PlatformList;
 typedef struct PlatformNode PlatformNode;
+typedef struct DialogueQueue DialogueQueue;
 
 //티켓 구조체
 typedef struct Ticket {
@@ -34,7 +38,7 @@ typedef struct Ticket {
 //승객 구조체
 typedef struct Passenger {
 	Ticket* ticket;
-	const char* dialogue[4];
+	DialogueQueue* dialogue;
 }Passenger;
 
 //플랫폼 구조체
@@ -60,6 +64,8 @@ typedef struct Day {
 	int totalGreatCount;
 	//잘못 응대한 날짜 누적 - 그날 wrongPassenger가 0이면 0으로 초기화
 	int wrongDayCount;
+	//티켓 카운트 - 날이 넘어가면 0으로 초기화
+	int ticketCount;
 	//대기 중인 승객 수 - 응대해야할 남은 승객
 	PassengerQueue* passengerQueue;
 	//플랫폼 리스트
@@ -201,7 +207,33 @@ void pushStation(StationStack* s, const char* data);
 //역 스택 요소 빼기 함수
 const char* popStation(StationStack* s);
 
-//다이얼로그 스택 리스트 큐 뭐로하지
+//다이얼로그 노드
+typedef struct DialogueNode {
+	const char* data;
+	struct DialogueNode* link;
+}DialogueNode;
+
+//다이얼로그 큐
+typedef struct DialogueQueue {
+	DialogueNode *front, *rear;
+}DialogueQueue;
+
+//큐는 malloc으로 초기 선언
+
+//승객 큐 초기화 함수
+void initDialogueQueue(DialogueQueue* q);
+
+//승객 큐 공백 확인 함수
+int isEmptyDialogueQueue(DialogueQueue* q);
+
+//승객 큐 요소 추가 함수
+void enqueueDialogue(DialogueQueue* q, const char* data);
+
+//승객 큐 요소 빼기 함수
+const char* dequeueDialogue(DialogueQueue* q);
+
+//큐 출력 함수
+void printDialogueQueue(DialogueQueue* q);
 
 //데이터베이스
 static const char* paint[6] = {
@@ -274,9 +306,77 @@ static const char* wrongLastText[6] = {
 };
 
 static const char* stationNames[4][5] = {
-	{"서울","용산","안양","수원","평택"},
-	{"속초","강릉","동해","기장","부산"},
-	{"인천","안산","화성","서산","군산"},
-	{"천안","논산","대전","대구","김해"}
+	{"뒤틀린 숲역","용의 척추역","침묵의 유적역","울음나무 역","잊혀진 사원역"},
+	{"서울역","군자역","대전역","경주역","부산역"},
+	{"발할라크로프트역","니블헬름역","룬가르드역","엘드스카르역","드라우그헤임역"},
+	{"엘드라노스역","아르카디아역","노르트에인역","타오타스역","에텔브룬역"}
 };
 
+static const char* firstDialogue[DIALOGUE_SIZE] = {
+	"저기요",
+	"그 어디였더라~~? 아 맞다!",
+	"%.4s....역....",
+	"그...여기...",
+	"%.5s!!!!!!!",
+	"안녕하세요. 티켓 여기있습니다.",
+	"아이!! 못 기다리겠네!! 내꺼 먼저 해줘!",
+	"(싸가지 없는 표정)",
+	"하암~~ 졸립다",
+	"어...엄....",
+	"빨리요 빨리!! 늦겠어요!!",
+	"저기요오....%.4s.....로...",
+	".....",
+	"내가 어디로 가게요~?",
+	"안녕히계세요.",
+	"지금 몇시에요?",
+	"여기 플랫폼이 어디죠?",
+	"기차.",
+	"%.4s에오오옹....",
+	"먁-아-!",
+};
+
+static const char* secondDialogue[DIALOGUE_SIZE] = {
+	"%s으로 가고 싶어요.",
+	"%s으로... 갈 수 있죠?...",
+	"티켓에 종착지가 안 적혀있어서... 어디로 가는 거에요?",
+	"%s으로 가려고 하는데 어떻게 가야해요?",
+	"%s.",
+	"%s 가?",
+	"그 뭐지... %s으로 가고 싶어요.",
+	"%s까지 가고 싶어요.",
+	"저는 %s까지 갈 건데요...",
+	"%s으로 여행을 가고 싶어요!",
+	".........",
+	"저는 %s으로 가요.",
+	"왜 티켓에 %s이라고 안 적혀있나요?",
+	"몇번 플랫폼이 %s 행 기차죠?",
+	"%s은 정말 아름다운 곳 일거에요...",
+	"이 역이 좋나요? %s이 좋나요?",
+	"%s 행 기차는 몇 시에 있죠?",
+	"저기로 가면 %s 행 기차를 탈 수 있나요?",
+	"%s 앞에는 택시가 있겠죠?",
+	"나는 %s에서 환승할 거에요.",
+};
+
+static const char* thirdDialogue[DIALOGUE_SIZE] = {
+	"%s말이에요!",
+	"%s으로 간다니까요!",
+	"%s입니다.",
+	"%s으로 가고 싶어요.",
+	"%s행 기차",
+	"%s",
+	"%s x100",
+	".........%s....",
+	"..........",
+	"목적지는 %s",
+	"%s으로!",
+	"%s이라니까!!!!!",
+	"%s!!!!",
+	"%s이요.",
+	"그래가지고 %s이요.",
+	"??? : %s",
+	"%s은 어디에~",
+	"%s이란 말이에요.",
+	"%s까지",
+	"마지막으로 말한다. %s",
+};

@@ -6,8 +6,8 @@
 #include <conio.h>
 
 //문자 들어갈 네모 그리는 함수
-void drawBox(int row, int col, int width, int height) {
-
+void drawBox(int row, int col, int width, int height)
+{
     //윗줄
     moveCursor(row, col);
     printf("┌");
@@ -31,7 +31,8 @@ void drawBox(int row, int col, int width, int height) {
 }
 
 //특정 위치에 메시지 출력 후 ENTER 입력 대기
-void printStoryAndWait(int row, int col, const char* str) {
+void printStoryAndWait(int row, int col, const char* str) 
+{
     moveCursor(row, col);
     printf("%s", str);
 
@@ -43,8 +44,8 @@ void printStoryAndWait(int row, int col, const char* str) {
 }
 
 //티켓 그리는 함수
-void drawTicket(Ticket ticket, int highlight) {
-	
+void drawTicket(Ticket ticket, int highlight) 
+{
     //티켓 박스 그리기
     drawBox(3, 0, 100, 14);
     
@@ -77,8 +78,8 @@ void drawTicket(Ticket ticket, int highlight) {
 }
 
 //메인 메뉴 그리는 함수
-void drawMainMenu() {
-
+void drawMainMenu() 
+{
     //타이틀 아스키
     const char* title[] = {
     " ____      _    ___ _       _____ ___       _    _   ___   ____        ___   _ _____ ____  _____ ",
@@ -111,7 +112,7 @@ void drawMainMenu() {
     while (menu) {
         system("cls");
 
-        drawBox(1, 0, 115, 50);
+        drawBox(1, 0, 115, 30);
 
         //로고 타이틀 그리기
         for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
@@ -169,13 +170,15 @@ void drawMainMenu() {
 }
 
 //게임 진행 그리는 함수
-void drawGame() {
-
+void drawGame() 
+{
     int isPlay = 1;
     int selected = 0;
     int optionsSize;
     int dialogueIndex = 0;
     int tutComplete = 0;
+    int greate = 1;
+    char* dialogue = "";
 
     //역 이름 세팅
     settingStation();
@@ -194,6 +197,7 @@ void drawGame() {
     //현재 승객
     Passenger* passenger;
     passenger = dequeue(day.passengerQueue);
+    dialogue = dequeueDialogue(passenger->dialogue);
 
     while (isPlay) {
 
@@ -212,12 +216,16 @@ void drawGame() {
         moveCursor(0, 2);
         printf("\033[1;34mDAY %d\033[0m", day.day);
 
+        //정상표 확인 안내
+        moveCursor(0, 75);
+        printf("\033[1;32mTAB 키를 눌러 정상표 확인\033[0m");
+
         //티켓 그리기
         drawTicket(*passenger->ticket, 0);
 
         //승객 다이얼로그 출력
         moveCursor(18, 2);
-        printf(passenger->dialogue[dialogueIndex], passenger->ticket->destination);
+        printf(dialogue, passenger->ticket->destination);
 
         //선택지 출력
         optionsSize = countPlatformList(day.platformList);
@@ -306,20 +314,20 @@ void drawGame() {
                 //플랫폼이 2개고 3번째가 네? 일 때
                 else {
                     //다음 다이얼로그로 이동
-                    dialogueIndex++;
+                    dialogue = dequeueDialogue(passenger->dialogue);
+                    greate = 0;
                     //다음 다이얼로그가 없으면 승객 빡쳐서 감
-                    if (dialogueIndex >= 4) {
+                    if (!dialogue) {
                         //잘못 응대 ++
                         day.wrongPassenger++;
                         //승객 데이터 없애고
                         killPassenger(passenger);
-                        //다이얼로그 인덱스 초기화
-                        dialogueIndex = 0;
+                        greate = 1;
                     }
                     //다음 다이얼로그가 있으면 다음거로
                     else continue;
+                    break;
                 }
-                break;
             }
             //4번째 선택지
             case 3: {
@@ -332,19 +340,35 @@ void drawGame() {
                 //플랫폼이 3개고 4번째가 네? 일 때
                 else {
                     //다음 다이얼로그로 이동
-                    dialogueIndex++;
+                    dialogue = dequeueDialogue(passenger->dialogue);
+                    greate = 0;
                     //다음 다이얼로그가 없으면 승객 빡쳐서 감
-                    if (dialogueIndex >= 4) {
+                    if (!dialogue) {
                         //잘못 응대 ++
                         day.wrongPassenger++;
                         //승객 데이터 없애고
                         killPassenger(passenger);
-                        //다이얼로그 인덱스 초기화
-                        dialogueIndex = 0;
+                        greate = 1;
                     }
                     //다음 다이얼로그가 있으면 다음거로
                     else continue;
+                    break;
                 }
+            }
+            case 4: {
+                //다음 다이얼로그로 이동
+                dialogue = dequeueDialogue(passenger->dialogue);
+                greate = 0;
+                //다음 다이얼로그가 없으면 승객 빡쳐서 감
+                if (!dialogue) {
+                    //잘못 응대 ++
+                    day.wrongPassenger++;
+                    //승객 데이터 없애고
+                    killPassenger(passenger);
+                    greate = 1;
+                }
+                //다음 다이얼로그가 있으면 다음거로
+                else continue;
                 break;
             }
             default:
@@ -375,14 +399,20 @@ void drawGame() {
                 //승객 카운트
                 day.totalGreatCount += day.greatPassenger;
                 day.totalWrongCount += day.wrongPassenger;
+                if (day.day == 3) day.wrongDayCount = 0;
                 if (day.wrongPassenger > 0) day.wrongDayCount++;
                 else day.wrongDayCount = 0;
 
                 //Day 통계 화면 출력
                 drawDayOver(day, &isPlay);
 
-                //잘못 응대 승객 수 - 훌륭 응대 승객 수가 3 이상이면 게임 종료
-                if (day.wrongPassenger - day.greatPassenger >= 3) break;
+                //1 ,2일째가 아니고
+                //잘못 응대 승객 수 - 훌륭 응대 승객 수가 3 이상이거나
+                //3일 연속 잘못 응대한 승객이 있으면 게임 종료
+                if (!(day.day == 1 || day.day == 2) && (day.wrongPassenger - day.greatPassenger > 3 || day.wrongDayCount >= 3)) {
+                    drawEnding(&day);
+                    break;
+                }
 
                 //마지막 근무일(30)이 아니면
                 if (day.day != 30) {
@@ -400,70 +430,137 @@ void drawGame() {
 
             //다음 승객 빼오기
             passenger = dequeue(day.passengerQueue);
+            dialogue = dequeueDialogue(passenger->dialogue);
         }        
         //ESC 입력 시
         else if (key == KEY_ESC) {
             drawPause(&isPlay);
         }
+
+        //TAB 입력 시
+        else if (key == KEY_TAB) {
+            drawNormalTicketCheck();
+        }
     }   
 }
 
 //Day 넘어가기 전 통계 화면
-void drawDayOver(Day day, int* isPlay) {
-    //화면 초기화
-    system("cls");
-    
-    //통계 박스 그리기
-    drawBox(2, 0, 110, 20);
+void drawDayOver(Day day, int* isPlay) 
+{
+    int state = 1;
 
-    //날짜 표시
-    moveCursor(5, 53);
-    printf("DAY %2d", day.day);
+    while(state) {
 
-    //잘 못 응대한 승객 수 표시
-    moveCursor(8, 44);
-    printf("잘못 응대한 승객 수 : %2d", day.wrongPassenger);
+        //화면 초기화
+        system("cls");
 
-    //첫날엔 훌륭 승객 수 출력 안함
-    if (day.day != 1) {
-        moveCursor(9, 42);
-        printf("훌륭하게 응대한 승객 수 : %2d", day.greatPassenger);
+        //통계 박스 그리기
+        drawBox(2, 0, 110, 20);
+
+        //날짜 표시
+        moveCursor(5, 53);
+        printf("DAY %2d", day.day);
+
+        //잘 못 응대한 승객 수 표시
+        moveCursor(8, 44);
+        printf("잘못 응대한 승객 수 : %2d", day.wrongPassenger);
+
+        //첫날엔 훌륭 승객 수 출력 안함
+        if (day.day != 1) {
+            moveCursor(9, 42);
+            printf("훌륭하게 응대한 승객 수 : %2d", day.greatPassenger);
+        }
+
+        //첫날엔 아묻따 칭찬
+        if (day.day == 1) {
+            moveCursor(13, 43);
+            if (day.wrongPassenger < 0)
+                printf("수고했네! 아주 잘 하고 있어");
+            else
+                printf("뭐...첫날이니 그럴 수 있네!");
+        }
+        //둘째날에 3번 실수하면 해고할 수 있다고 알려줌
+        else if (day.day == 2) {
+            moveCursor(13, 17);
+            printf("내가 그거 말했나? 하루에 실수가 3번을 넘거나 연속 3일로 실수가 한번이라도 있으면");
+            moveCursor(15, 48);
+            printf("\033[1;31m자넨 해고라네!\033[0m");
+            moveCursor(17, 30);
+            printf("하지만, 그만큼 훌륭하게 응대한 손님이 있다면 봐줄지도.");
+            moveCursor(18, 35);
+            printf("\033[1;34m[애매한 손님을 한번에 제대로 안내해준 경우]\033[0m");
+        }
+
+        //잘못 응대 - 훌륭 응대 가 3초과(4이상)이면 해고
+        if (!(day.day == 1 || day.day == 2) && day.wrongPassenger - day.greatPassenger > 3) {
+            moveCursor(13, 40);
+            printf("시간 낭비한 손님이 몇명인가!!");
+            moveCursor(15, 49);
+            printf("\033[1;31m자넨 해고야!\033[0m");
+        }
+        //연속 3일 잘못 응대가 있으면 해고 통지
+        else if (!(day.day == 1 || day.day == 2) && day.wrongDayCount >= 3) {
+            moveCursor(13, 46);
+            printf("3일 연속 실수라니!!");
+            moveCursor(15, 49);
+            printf("\033[1;31m자넨 해고야!\033[0m");
+        }
+        //해고 통지 이외의 평가
+        else {
+            //잘못 응대한 손님이 하나도 없으면
+            if (!(day.day == 1 || day.day == 2) && day.wrongPassenger == 0) {
+                moveCursor(15, 44);
+                switch (rand() % 5) {
+                case 0:
+                    printf("일을 훌륭히 해내고 있군!");
+                    break;
+                case 1:
+                    printf("완벽하게 안내를 해냈구만!");
+                    break;
+                case 2:
+                    printf("자네 인공지능인가? 허허!");
+                    break;
+                case 3:
+                    printf("내가 직원을 잘 뽑았구만!");
+                    break;
+                case 4:
+                    printf("자네만한 인재는 없겠어!");
+                    break;
+                }
+            }
+            //잘못 응대 - 훌륭 응대 한 손님이 3이하 라면
+            else if(!(day.day == 1 || day.day == 2) && day.wrongPassenger - day.greatPassenger <= 3) {
+                moveCursor(15, 44);
+                switch (rand() % 5) {
+                case 0:
+                    printf("하하 긴장하는게 좋을걸세");
+                    break;
+                case 1:
+                    printf("실수를 더 늘리지 말게나!");
+                    break;
+                case 2:
+                    printf("자네 일이 많이 힘든가보군");
+                    break;
+                case 3:
+                    printf("조금만 더 분발하도록 하게");
+                    break;
+                case 4:
+                    printf("이 이상 실수를 하면 안돼.");
+                    break;
+                }
+            }
+        }
+
+        //다음날 메시지 출력
+        moveCursor(26, 48);
+        printf("\033[1;33m> %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
+
+        int key = _getch();
+
+        if (key == KEY_ENTER) {
+            state = 0;
+        }
     }
-
-    //첫날엔 아묻따 칭찬
-    if (day.day == 1) {
-        moveCursor(13, 43);
-        printf("수고했네! 아주 잘 하고 있어");
-    }
-    //둘째날에 3번 실수하면 해고할 수 있다고 알려줌
-    else if (day.day == 2) {
-        moveCursor(13, 17);
-        printf("내가 그거 말했나? 하루에 실수가 3번을 넘거나 연속 3일로 실수가 한번이라도 있으면");
-        moveCursor(15, 49);
-        printf("\033[1;31m자넨 해고야!\033[0m");
-        moveCursor(17, 30);
-        printf("하지만, 그만큼 훌륭하게 응대한 손님이 있다면 봐줄지도.");
-    }
-
-    //잘못 응대 - 훌륭 응대 가 3초과(4이상)이면 해고
-    if (day.wrongPassenger - day.greatPassenger > 3) {
-        moveCursor(13, 40);
-        printf("시간 낭비한 손님이 몇명인가!!");
-        moveCursor(15, 49);
-        printf("\033[1;31m자넨 해고야!\033[0m");
-    }
-    else if (day.wrongDayCount >= 3){
-        moveCursor(13, 46);
-        printf("3일 연속 실수라니!!");
-        moveCursor(15, 49);
-        printf("\033[1;31m자넨 해고야!\033[0m");
-    }
-
-    //다음날 메시지 출력
-    moveCursor(26, 48);
-    printf("\033[1;33m> %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
-
-    int key = _getch();
 }
 
 //일시 정지 화면
@@ -551,121 +648,145 @@ void drawPause(int* isPlay)
 //플랫폼 현황 화면
 void drawPlatformState(Day* day)
 {
-    //화면 초기화
-    system("cls");
-
-    //박스 그리기
-    drawBox(2, 0, 110, 20);
-
-    //플랫폼 현황판 타이틀 출력
-    moveCursor(5, 45);
-    printf("★ 플랫폼 별 노선도 ★");
-
-    //현재 플랫폼 출력
-    PlatformNode* current = day->platformList->link;
-    int index = 0;
-    do {
-        Platform* platform = current->data;
-
-        moveCursor(8 + index*3, 25);
-        printf("%d번 플랫폼 : ", platform->num);
-        printStationList(platform->stationList);
-
-        current = current->link;
-        index++;
-    } while (current != day->platformList->link);
-
-    //1일째
-    if (day->day == 1) {
-        moveCursor(19, 25);
-        printf("우리역의 플랫폼 별 노선도네! 잘 숙지하는 게 좋을거야");
-    }
-    //2~3일째
-    else if (1 < day->day && day->day <= 3) {
-        moveCursor(19, 25);
-        printf("두 플랫폼의 역이 확장 되었네! 자네는 고생 좀 하겠어");
-    }
-    //7일째
-    else if (day->day == 7) {
-        moveCursor(19, 25);
-        printf("플랫폼 확장 공사를 했다네! 일이 더 힘들어지겠군");
-    }
-    //7~9일째
-    else if (7 < day->day && day->day <= 9) {
-        moveCursor(19, 25);
-        printf("두 플랫폼의 역이 확장 되었네! 역이 점점 성장하는군!");
-    }
-    //14일째
-    else if (day->day == 14) {
-        moveCursor(19, 25);
-        printf("플랫폼 확장 공사를 했다네! 이번이 마지막이니 걱정 말게나!");
-    }
-    //14~16일째
-    else if (14 < day->day && day->day <= 16) {
-        moveCursor(19, 25);
-        printf("새로운 플랫폼의 역이 확장 되었네! 조금 더 힘내주게");
-    }
-    //21일째
-    else if (day->day == 21) {
-        moveCursor(19, 25);
-        printf("플랫폼의 들어오는 열차가 서로 바뀌었네! 잘 확인해보게나");
-    }
-    //24일째
-    else if (day->day == 24) {
-        moveCursor(19, 25);
-        printf("플랫폼의 들어오는 열차가 다시 한번 바뀌었어! 실수하지 않도록 주의하게");
-    }
-    //30일째
-    else if (day->day == 30) {
-        moveCursor(19, 25);
-        printf("열차가 다시 바뀌었다지 뭔가... 끝까지 잘해보세!");
-    }
+    int state = 1;
     
-    //다음날 메시지 출력
-    moveCursor(26, 48);
-    printf("\033[1;33m> 근무 시작\033[0m");
+    while (state) {
 
-    int key = _getch();
+        //화면 초기화
+        system("cls");
+
+        //박스 그리기
+        drawBox(2, 0, 110, 20);
+
+        //플랫폼 현황판 타이틀 출력
+        moveCursor(5, 45);
+        printf("★ 플랫폼 별 노선도 ★");
+
+        //현재 플랫폼 출력
+        PlatformNode* current = day->platformList->link;
+        int index = 0;
+        do {
+            Platform* platform = current->data;
+
+            moveCursor(8 + index * 3, 14);
+            printf("%d번 플랫폼 : ", platform->num);
+            printStationList(platform->stationList);
+
+            current = current->link;
+            index++;
+        } while (current != day->platformList->link);
+
+        moveCursor(19, 14);
+        printf("\033[1;32m");
+        //1일째
+        if (day->day == 1) {
+            printf("우리역의 플랫폼 별 노선도네! 잘 숙지하는 게 좋을거야");
+        }
+        //2~3일째
+        else if (1 < day->day && day->day <= 3) {
+            printf("두 플랫폼의 역이 확장 되었네! 자네는 고생 좀 하겠어");
+        }
+        //7일째
+        else if (day->day == 7) {
+            printf("플랫폼 확장 공사를 했다네! 일이 더 힘들어지겠군");
+        }
+        //7~9일째
+        else if (7 < day->day && day->day <= 9) {
+            printf("두 플랫폼의 역이 확장 되었네! 역이 점점 성장하는군!");
+        }
+        //14일째
+        else if (day->day == 14) {
+            printf("플랫폼 확장 공사를 했다네! 이번이 마지막이니 걱정 말게나!");
+        }
+        //14~16일째
+        else if (14 < day->day && day->day <= 16) {
+            printf("새로운 플랫폼의 역이 확장 되었네! 조금 더 힘내주게");
+        }
+        //21일째
+        else if (day->day == 21) {
+            printf("플랫폼의 들어오는 열차가 서로 바뀌었네! 잘 확인해보게나");
+        }
+        //24일째
+        else if (day->day == 24) {
+            printf("플랫폼의 들어오는 열차가 다시 한번 바뀌었어! 실수하지 않도록 주의하게");
+        }
+        //30일째
+        else if (day->day == 30) {
+            printf("열차가 다시 바뀌었다지 뭔가... 끝까지 잘해보세!");
+        }
+        printf("\033[0m");
+
+        //다음날 메시지 출력
+        moveCursor(26, 48);
+        printf("\033[1;33m> 근무 시작\033[0m");
+
+        int key = _getch();
+
+        if (key == KEY_ENTER) {
+            state = 0;
+        }
+    }
 }
 
 //엔딩 화면
 void drawEnding(Day* day)
 {
-    system("cls");
+    int state = 1;
 
-    //통계 박스 그리기
-    drawBox(2, 0, 110, 20);
+    while (state) {
 
-    //날짜 표시
-    moveCursor(5, 53);
-    printf("DAY %2d", day->day);
-    
-    moveCursor(7, 48);
-    printf("한 달 근무 결과");
-    moveCursor(9, 44);
-    printf("총 응대한 승객 수 : %2d", day->totalPassengerCount);
-    moveCursor(10, 44);
-    printf("잘못 응대한 승객 수 : %2d", day->totalWrongCount);
-    moveCursor(11, 42);
-    printf("훌륭하게 응대한 승객 수 : %2d", day->totalGreatCount);
+        system("cls");
 
-    moveCursor(14, 38);
-    if (day->totalGreatCount == 0 && day->totalWrongCount == 0) {
-        printf("완벽하게 승객을 응대했군! 아주 훌륭해!");
+        //통계 박스 그리기
+        drawBox(2, 0, 110, 20);
+
+        //날짜 표시
+        moveCursor(5, 53);
+        printf("DAY %2d", day->day);
+
+        //찐 막 근무일이면
+        if (day->day == 30) {
+            moveCursor(7, 46);
+            printf("\033[1;32m★ 한 달 근무 결과 ★\033[0m");
+
+            moveCursor(14, 38);
+            if (day->totalGreatCount == 0 && day->totalWrongCount == 0) {
+                printf("완벽하게 승객을 응대했군! 아주 훌륭해!");
+            }
+            else if (day->totalWrongCount > 0 && (day->totalWrongCount - day->totalGreatCount < 4)) {
+                printf("이 정도면 완벽하진 않지만, 훌륭하네!");
+            }
+
+            moveCursor(16, 35);
+            printf("앞으로는 내 도움 없이도 잘할 수 있을 거야.");
+            moveCursor(18, 37);
+            printf("이제는 자네만의 선로를 개척해 보게나!");
+        }
+        //중간에 해고 당한 거면
+        else {
+            moveCursor(16, 35);
+            printf("자네 덕분에 고객과 소통할 기회가 많아졌군.");
+            moveCursor(18, 37);
+            printf("미안하지만 내일부터는 출근할 필요없네.");
+        }
+
+        moveCursor(9, 44);
+        printf("총 응대한 승객 수 : %2d", day->totalPassengerCount);
+        moveCursor(10, 44);
+        printf("잘못 응대한 승객 수 : %2d", day->totalWrongCount);
+        moveCursor(11, 42);
+        printf("훌륭하게 응대한 승객 수 : %2d", day->totalGreatCount);
+
+        //타이틀로 메시지 출력
+        moveCursor(26, 48);
+        printf("\033[1;33m> 타이틀로\033[0m");
+
+        int key = _getch();
+
+        if (key == KEY_ENTER) {
+            state = 0;
+        }
     }
-    else if (day->totalWrongCount > 0 && (day->totalWrongCount - day->totalGreatCount < 4)) {
-        printf("이 정도면 완벽하진 않지만, 훌륭하네!");
-    }
-    moveCursor(16, 35);
-    printf("앞으로는 내 도움 없이도 잘할 수 있을 거야.");
-    moveCursor(18, 37);
-    printf("이제는 자네만의 선로를 개척해 보게나!");
-
-    //타이틀로 메시지 출력
-    moveCursor(26, 48);
-    printf("> 타이틀로");
-
-    int key = _getch();
 }
 
 //튜토리얼 시퀀스
@@ -738,7 +859,7 @@ void drawTutorial()
                     _getch();
                     drawTicket(wt, 1);
                     moveCursor(22, 2);
-                    printf("만약 지금 보여주는 표처럼 어딘가 이상한 표라면 경찰서에 연락을 해야하네!");
+                    printf("지금 보여주는 표처럼 어딘가 이상한 표라면 경찰서에 연락하게! \033[1;33m[커서를 움직일 때마다 다른 종류의 위조표를 보여줍니다.]\033[0m");
                     moveCursor(23, 2);
                     printf("\033[1;32m※ 위조표는 표의 순서가 다르거나, 상단 오른쪽 왼쪽 숫자가 다르거나, 그림이 이상하거나, 좌측 하단 문자가 이상합니다. ※\033[0m");
                     _getch();
@@ -750,7 +871,7 @@ void drawTutorial()
                     moveCursor(20, 2);
                     printf("하지만 표가 있다고 아무나 받아서는 안되네. \033[1;31m위조표\033[0m를 들고오는 범죄자도 있기 때문이지. 지금 표가 정상표지만..");
                     moveCursor(22, 2);
-                    printf("만약 지금 보여주는 표처럼 어딘가 이상한 표라면 경찰서에 연락을 해야하네!");
+                    printf("지금 보여주는 표처럼 어딘가 이상한 표라면 경찰서에 연락하게! \033[1;33m[커서를 움직일 때마다 다른 종류의 위조표를 보여줍니다.]\033[0m");
                     moveCursor(23, 2);
                     printf("\033[1;32m※ 위조표는 표의 순서가 다르거나, 상단 오른쪽 왼쪽 숫자가 다르거나, 그림이 이상하거나, 좌측 하단 문자가 이상합니다. ※\033[0m");
                     if (policeNotice) {
@@ -821,7 +942,6 @@ void drawTutorial()
                 if (duringPolice) completePolice = 1;
                 break;
             }
-
         }
     }
 }
@@ -843,7 +963,7 @@ void drawInfo()
     while (info) {
         system("cls");
 
-        drawBox(1, 0, 115, 50);
+        drawBox(1, 0, 115, 30);
 
         //로고 타이틀 그리기
         for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
@@ -868,8 +988,8 @@ void drawInfo()
         //조작법 출력
         moveCursor(24, 2);
         printf("================================================== \033[1;34m조작 방법\033[0m ====================================================");
-        moveCursor(27, 40);
-        printf("\033[1;32m←, →, ↑, ↓ : 고르기 | Enter : 선택\033[0m");
+        moveCursor(27, 20);
+        printf("\033[1;32m[ ←, →, ↑, ↓ : 고르기 | Enter : 선택 | TAB : 정상표 확인 | ESC : 일시정지 ]\033[0m");
 
         moveCursor(30, 39);
         printf("\033[1m ESC를 누르면 메인 메뉴로 돌아갑니다. \033[0m");
@@ -877,6 +997,36 @@ void drawInfo()
         int key = _getch();
         if (key == KEY_ESC) {
             info = 0;
+        }
+    }
+}
+
+//정상표 확인 화면
+void drawNormalTicketCheck()
+{
+    int state = 1;
+
+    Ticket t = createTutTicket(0);
+
+    while (state) {
+
+        system("cls");
+
+        //제목
+        moveCursor(0, 2);
+        printf("\033[1;34m정상표 견본\033[0m");
+
+        //티켓 그리기
+        drawTicket(t, 0);
+
+        //돌아가기 안내
+        moveCursor(26, 0);
+        printf("\033[01;33m TAB 키를 눌러 돌아가기\033[0m");
+
+        int key = _getch();
+
+        if (KEY_TAB) {
+            state = 0;
         }
     }
 }

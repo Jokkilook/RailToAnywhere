@@ -7,6 +7,7 @@ typedef struct Passenger Passenger;
 typedef struct Platform Platform;
 typedef struct Ticket Ticket;
 typedef struct Day Day;
+typedef struct DialogueQueue DialogueQueue;
 
 //커서 이동 함수
 void moveCursor(int row, int col);
@@ -64,3 +65,9 @@ void settingStation();
 
 //해당 플랫폼에 저장된 역 이름 하나 가져오기
 const char* getStationFromPlatform(int num);
+
+//승객 다이얼로그 생성
+DialogueQueue* createPassengerDialogue();
+
+//훌륭히 응대한 승객 판단 함수
+int checkFirstComplete(Passenger* passenger);

@@ -452,3 +452,69 @@ const char* popStation(StationStack* s)
 		return data;
 	}
 }
+
+//승객 큐 초기화 함수
+void initDialogueQueue(DialogueQueue* q)
+{
+	q->front = NULL;
+	q->rear = NULL;
+}
+
+//승객 큐 공백 확인 함수
+int isEmptyDialogueQueue(DialogueQueue* q) {
+	//if (q->front == NULL && q->rear == NULL) return 1;
+	if (q->front == NULL) return 1;
+
+	return 0;
+}
+
+//승객 큐 요소 추가 함수
+void enqueueDialogue(DialogueQueue* q, const char* data) {
+	DialogueNode* temp = (DialogueNode*)malloc(sizeof(DialogueNode));
+	temp->data = data;
+	temp->link = NULL;
+
+	if (isEmptyDialogueQueue(q)) {
+		q->front = temp;
+		q->rear = temp;
+	}
+	else {
+		q->rear->link = temp;
+		q->rear = temp;
+	}
+}
+
+//승객 큐 요소 빼기 함수
+const char* dequeueDialogue(DialogueQueue* q)
+{
+	DialogueNode* temp = q->front;
+	const char* data;
+	if (isEmptyDialogueQueue(q)) {
+		return NULL;
+	}
+	else {
+		data = temp->data;
+		q->front = q->front->link;
+		if (q->front == NULL)
+			q->rear = NULL;
+		free(temp);
+		return data;
+	}
+}
+
+//큐 출력 함수
+void printDialogueQueue(DialogueQueue* q) {
+	if (isEmptyDialogueQueue(q)) {
+		printf("");
+		return;
+	}
+
+	DialogueNode* curr = q->front;
+	int index = 1;
+
+	while (curr != NULL) {
+		const char* p = curr->data;
+		printf("%s", p);
+		curr = curr->link;
+	}
+}
