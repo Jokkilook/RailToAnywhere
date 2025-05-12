@@ -175,7 +175,6 @@ void drawGame()
     int isPlay = 1;
     int selected = 0;
     int optionsSize;
-    int dialogueIndex = 0;
     int tutComplete = 0;
     int greate = 1;
     char* dialogue = "";
@@ -326,8 +325,8 @@ void drawGame()
                     }
                     //다음 다이얼로그가 있으면 다음거로
                     else continue;
-                    break;
                 }
+                break;
             }
             //4번째 선택지
             case 3: {
@@ -352,8 +351,8 @@ void drawGame()
                     }
                     //다음 다이얼로그가 있으면 다음거로
                     else continue;
-                    break;
                 }
+                break;
             }
             case 4: {
                 //다음 다이얼로그로 이동
@@ -385,8 +384,6 @@ void drawGame()
 
             //선택 초기화
             selected = 0;
-            //다이얼로그 인덱스 초기화
-            dialogueIndex = 0;
 
             //선택 후 메시지 출력
             //예정
