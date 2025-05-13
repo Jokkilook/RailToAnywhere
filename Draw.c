@@ -106,10 +106,11 @@ void drawMainMenu()
     };
 
     int menu = 1;
+    int select = 1;
     int menuCount = 3;
     int selected = 0;
-
     while (menu) {
+
         system("cls");
 
         drawBox(1, 0, 115, 30);
@@ -127,43 +128,49 @@ void drawMainMenu()
         //메뉴 박스 출력
         drawBox(20, 50, 15, 7);
 
-        //메뉴 출력
-        for (int i = 0; i < 3; ++i) {
-            moveCursor(22 + i, 51);
-            if (i == selected)
-                printf("\033[01;33m > %s\033[0m\n", menus[i]);
-            else if (i == menuCount - 1)
-                printf("   %s", menus[i]);
-            else
-                printf("   %s\n", menus[i]);
-        }
+        select = 1;
 
-        moveCursor(24, 62);
-
-        int key = _getch();
-
-        if (key == 0 || key == 224) {
-            key = _getch();
-            switch (key) {
-            case KEY_UP:
-                selected = (selected - 1 + menuCount) % menuCount;
-                break;
-            case KEY_DOWN:
-                selected = (selected + 1) % menuCount;
-                break;
+        while (select) {
+            //메뉴 출력
+            for (int i = 0; i < 3; ++i) {
+                moveCursor(22 + i, 51);
+                if (i == selected)
+                    printf("\033[01;33m > %s\033[0m\n", menus[i]);
+                else if (i == menuCount - 1)
+                    printf("   %s", menus[i]);
+                else
+                    printf("   %s\n", menus[i]);
             }
-        }
-        else if (key == KEY_ENTER) {
-            switch (selected) {
-            case 0:
-                drawGame();
-                break;
-            case 1:
-                drawInfo();
-                break;
-            case 2:
-                exit(0);
-                break;
+
+            moveCursor(24, 62);
+
+            int key = _getch();
+
+            if (key == 0 || key == 224) {
+                key = _getch();
+                switch (key) {
+                case KEY_UP:
+                    selected = (selected - 1 + menuCount) % menuCount;
+                    break;
+                case KEY_DOWN:
+                    selected = (selected + 1) % menuCount;
+                    break;
+                }
+            }
+            else if (key == KEY_ENTER) {
+                switch (selected) {
+                case 0:
+                    drawGame();
+                    select = 0;
+                    break;
+                case 1:
+                    drawInfo();
+                    select = 0;
+                    break;
+                case 2:
+                    exit(0);
+                    break;
+                }
             }
         }
     }
@@ -173,6 +180,7 @@ void drawMainMenu()
 void drawGame() 
 {
     int isPlay = 1;
+    int select = 1;
     int selected = 0;
     int optionsSize;
     int tutComplete = 0;
@@ -222,96 +230,150 @@ void drawGame()
         //티켓 그리기
         drawTicket(*passenger->ticket, 0);
 
-        //승객 다이얼로그 출력
-        moveCursor(18, 2);
-        printf(dialogue, passenger->ticket->destination);
+        select = 1;
 
-        //선택지 출력
-        optionsSize = countPlatformList(day.platformList);
-        moveCursor(26, 0);
-        PlatformNode* p = day.platformList->link;
-        do {
-            if (p->data->num - 1 == selected)
-                printf("\033[1;33m > %d번 플랫폼\033[0m", p->data->num);
+        while (select) {
+
+            //기존 출력 다이얼로그 없애기
+            moveCursor(18, 2);
+            printf("                                                                   ");
+            //승객 다이얼로그 출력
+            moveCursor(18, 2);
+            printf(dialogue, passenger->ticket->destination);
+
+            //선택지 출력
+            optionsSize = countPlatformList(day.platformList);
+            moveCursor(26, 0);
+            PlatformNode* p = day.platformList->link;
+            do {
+                if (p->data->num - 1 == selected)
+                    printf("\033[1;33m > %d번 플랫폼\033[0m", p->data->num);
+                else
+                    printf("   %d번 플랫폼", p->data->num);
+                p = p->link;
+            } while (p != day.platformList->link);
+
+            //되묻기 출력
+            if (selected == optionsSize)
+                printf("\033[1;33m > 네?\033[0m");
             else
-                printf("   %d번 플랫폼", p->data->num);
-            p = p->link;
-        } while (p != day.platformList->link);
+                printf("   네?");
 
-        //되묻기 출력
-        if (selected == optionsSize)
-            printf("\033[1;33m > 네?\033[0m");
-        else
-            printf("   네?");
-        
-        //경찰서 출력
-        moveCursor(28, 0);
-        if (selected > optionsSize || selected < 0)
-            printf("\033[1;31m > ☎  경찰서\033[0m");
-        else
-            printf("   ☎  경찰서");
+            //경찰서 출력
+            moveCursor(28, 0);
+            if (selected > optionsSize || selected < 0)
+                printf("\033[1;31m > ☎  경찰서\033[0m");
+            else
+                printf("   ☎  경찰서");
 
-        //디버그 출력
-        moveCursor(0, 10);
-        printf("남은 승객 : ");
-        printQueue(day.passengerQueue);
-        //moveCursor(1, 10);
-        //printf("PQ ADDRESS: %p\n", (void*)day.passengerQueue);
-        //moveCursor(30, 0);
-        //printf("SELECTED : %d\n", selected);
-        //printf("1 : %d\n", day.platformList->link->data->num);
-        //printf("2 : %d\n", day.platformList->link->link->data->num);
-        //printf("3 : %d\n", day.platformList->link->link->link->data->num);
-        //printf("4 : %d\n", day.platformList->link->link->link->link->data->num);
-        //printPlatformList(day.platformList);
+            //디버그 출력
+            moveCursor(0, 10);
+            printf("남은 승객 : ");
+            printQueue(day.passengerQueue);
+            //moveCursor(1, 10);
+            //printf("PQ ADDRESS: %p\n", (void*)day.passengerQueue);
+            //moveCursor(30, 0);
+            //printf("SELECTED : %d\n", selected);
+            //printf("1 : %d\n", day.platformList->link->data->num);
+            //printf("2 : %d\n", day.platformList->link->link->data->num);
+            //printf("3 : %d\n", day.platformList->link->link->link->data->num);
+            //printf("4 : %d\n", day.platformList->link->link->link->link->data->num);
+            //printPlatformList(day.platformList);
 
-        //플레이어 입력 받기
-        int key = _getch();
+            //플레이어 입력 받기
+            int key = _getch();
 
-        //방향기 좌우 입력 시
-        if (key == 0 || key == 224) {
-            key = _getch();
-            switch (key) {
-            case KEY_LEFT:
-                selected = (selected - 1 + optionsSize+1) % (optionsSize+1);
-                break;
-            case KEY_RIGHT:
-                selected = (selected + 1) % (optionsSize+1);
-                break;
-            case KEY_UP:
-            case KEY_DOWN:
-                selected = selected > optionsSize ? 0 : 100;
-                break;
-            }
-        }
-        //엔터 입력 시
-        else if (key == KEY_ENTER) {
-            //선택지의 따라
-            switch (selected) {
-            //1번째 선택지
-            case 0: {
-                //승객을 첫번째 플랫폼으로 보냄
-                PassengerStack* p1ps = day.platformList->link->data->passengerStack;
-                push(p1ps, passenger);
-                break;
-            }
-            //2번째 선택지
-            case 1: {
-                //승객을 두번째 플랫폼으로 보냄
-                PassengerStack* p2ps = day.platformList->link->link->data->passengerStack;
-                push(p2ps, passenger);
-                break;
-            }
-            //3번째 선택지
-            case 2: {
-                PassengerStack* p3ps = day.platformList->link->link->link->data->passengerStack;
-                //플랫폼 3개 이상일 때
-                if (countPlatformList(day.platformList) >= 3) {
-                    //승객을 세번째 플랫폼으로 보냄
-                    push(p3ps, passenger);
+            //방향기 좌우 입력 시
+            if (key == 0 || key == 224) {
+                key = _getch();
+                switch (key) {
+                case KEY_LEFT:
+                    selected = (selected - 1 + optionsSize + 1) % (optionsSize + 1);
+                    break;
+                case KEY_RIGHT:
+                    selected = (selected + 1) % (optionsSize + 1);
+                    break;
+                case KEY_UP:
+                case KEY_DOWN:
+                    selected = selected > optionsSize ? 0 : 100;
+                    break;
                 }
-                //플랫폼이 2개고 3번째가 네? 일 때
-                else {
+            }
+            //엔터 입력 시
+            else if (key == KEY_ENTER) {
+                //선택지의 따라
+                switch (selected) {
+                    //1번째 선택지
+                case 0: {
+                    //승객을 첫번째 플랫폼으로 보냄
+                    PassengerStack* p1ps = day.platformList->link->data->passengerStack;
+                    push(p1ps, passenger);
+                    break;
+                }
+                      //2번째 선택지
+                case 1: {
+                    //승객을 두번째 플랫폼으로 보냄
+                    PassengerStack* p2ps = day.platformList->link->link->data->passengerStack;
+                    push(p2ps, passenger);
+                    break;
+                }
+                      //3번째 선택지
+                case 2: {
+                    PassengerStack* p3ps = day.platformList->link->link->link->data->passengerStack;
+                    //플랫폼 3개 이상일 때
+                    if (countPlatformList(day.platformList) >= 3) {
+                        //승객을 세번째 플랫폼으로 보냄
+                        push(p3ps, passenger);
+                    }
+                    //플랫폼이 2개고 3번째가 네? 일 때
+                    else {
+                        //다음 다이얼로그로 이동
+                        dialogue = dequeueDialogue(passenger->dialogue);
+                        greate = 0;
+                        //다음 다이얼로그가 없으면 승객 빡쳐서 감
+                        if (!dialogue) {
+                            //잘못 응대 ++
+                            day.wrongPassenger++;
+                            //승객 데이터 없애고
+                            killPassenger(passenger);
+                            greate = 1;
+                        }
+                        //다음 다이얼로그가 있으면 다음거로
+                        else {
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                      //4번째 선택지
+                case 3: {
+                    PassengerStack* p4ps = day.platformList->link->link->link->link->data->passengerStack;
+                    //플랫폼 4개 이상일 때
+                    if (countPlatformList(day.platformList) >= 4) {
+                        //승객을 네번째 플랫폼으로 보냄
+                        push(p4ps, passenger);
+                    }
+                    //플랫폼이 3개고 4번째가 네? 일 때
+                    else {
+                        //다음 다이얼로그로 이동
+                        dialogue = dequeueDialogue(passenger->dialogue);
+                        greate = 0;
+                        //다음 다이얼로그가 없으면 승객 빡쳐서 감
+                        if (!dialogue) {
+                            //잘못 응대 ++
+                            day.wrongPassenger++;
+                            //승객 데이터 없애고
+                            killPassenger(passenger);
+                            greate = 1;
+                        }
+                        //다음 다이얼로그가 있으면 다음거로
+                        else {
+                            continue;
+                        }
+                    }
+                    break;
+                }
+                case 4: {
                     //다음 다이얼로그로 이동
                     dialogue = dequeueDialogue(passenger->dialogue);
                     greate = 0;
@@ -324,119 +386,81 @@ void drawGame()
                         greate = 1;
                     }
                     //다음 다이얼로그가 있으면 다음거로
-                    else continue;
-                }
-                break;
-            }
-            //4번째 선택지
-            case 3: {
-                PassengerStack* p4ps = day.platformList->link->link->link->link->data->passengerStack;
-                //플랫폼 4개 이상일 때
-                if (countPlatformList(day.platformList) >= 4) {
-                    //승객을 네번째 플랫폼으로 보냄
-                    push(p4ps, passenger);
-                }
-                //플랫폼이 3개고 4번째가 네? 일 때
-                else {
-                    //다음 다이얼로그로 이동
-                    dialogue = dequeueDialogue(passenger->dialogue);
-                    greate = 0;
-                    //다음 다이얼로그가 없으면 승객 빡쳐서 감
-                    if (!dialogue) {
-                        //잘못 응대 ++
-                        day.wrongPassenger++;
-                        //승객 데이터 없애고
-                        killPassenger(passenger);
-                        greate = 1;
+                    else {
+                        continue;
                     }
-                    //다음 다이얼로그가 있으면 다음거로
-                    else continue;
+                    break;
                 }
-                break;
-            }
-            case 4: {
-                //다음 다이얼로그로 이동
-                dialogue = dequeueDialogue(passenger->dialogue);
-                greate = 0;
-                //다음 다이얼로그가 없으면 승객 빡쳐서 감
-                if (!dialogue) {
-                    //잘못 응대 ++
-                    day.wrongPassenger++;
-                    //승객 데이터 없애고
+                default:
+                    //경찰서 신고 (위조 티켓)
+                    if (passenger->ticket->isWrong) {
+                    }
+                    //위조 티켓아닌데 신고한거면
+                    else {
+                        day.wrongPassenger++;
+                    }
                     killPassenger(passenger);
-                    greate = 1;
-                }
-                //다음 다이얼로그가 있으면 다음거로
-                else continue;
-                break;
-            }
-            default:
-                //경찰서 신고 (위조 티켓)
-                if (passenger->ticket->isWrong) {
-                }
-                //위조 티켓아닌데 신고한거면
-                else {
-                    day.wrongPassenger++;
-                }
-                killPassenger(passenger);
-                break;
-            }
-
-            //선택 초기화
-            selected = 0;
-
-            //선택 후 메시지 출력
-            //예정
-
-            //승객 큐가 비었으면
-            if (isEmptyQueue(day.passengerQueue)) {
-                //모든 플랫폼 별 승객 검사
-                checkPlatformPassenger(&day);
-
-                //승객 카운트
-                day.totalGreatCount += day.greatPassenger;
-                day.totalWrongCount += day.wrongPassenger;
-                if (day.day == 3) day.wrongDayCount = 0;
-                if (day.wrongPassenger > 0) day.wrongDayCount++;
-                else day.wrongDayCount = 0;
-
-                //Day 통계 화면 출력
-                drawDayOver(day, &isPlay);
-
-                //1 ,2일째가 아니고
-                //잘못 응대 승객 수 - 훌륭 응대 승객 수가 3 이상이거나
-                //3일 연속 잘못 응대한 승객이 있으면 게임 종료
-                if (!(day.day == 1 || day.day == 2) && (day.wrongPassenger - day.greatPassenger > 3 || day.wrongDayCount >= 3)) {
-                    drawEnding(&day);
+                    select = 0;
                     break;
                 }
 
-                //마지막 근무일(30)이 아니면
-                if (day.day != 30) {
-                    //다음 날 시퀀스 작동
-                    nextDay(&day);
-                    //플랫폼 현황 화면 출력
-                    drawPlatformState(&day);
+                //선택 초기화
+                selected = 0;
+
+                //선택 후 메시지 출력
+                //예정
+
+                //승객 큐가 비었으면
+                if (isEmptyQueue(day.passengerQueue)) {
+                    //모든 플랫폼 별 승객 검사
+                    checkPlatformPassenger(&day);
+
+                    //승객 카운트
+                    day.totalGreatCount += day.greatPassenger;
+                    day.totalWrongCount += day.wrongPassenger;
+                    if (day.day == 3) day.wrongDayCount = 0;
+                    if (day.wrongPassenger > 0) day.wrongDayCount++;
+                    else day.wrongDayCount = 0;
+
+                    //Day 통계 화면 출력
+                    drawDayOver(day, &isPlay);
+
+                    //1 ,2일째가 아니고
+                    //잘못 응대 승객 수 - 훌륭 응대 승객 수가 3 이상이거나
+                    //3일 연속 잘못 응대한 승객이 있으면 게임 종료
+                    if (!(day.day == 1 || day.day == 2) && (day.wrongPassenger - day.greatPassenger > 3 || day.wrongDayCount >= 3)) {
+                        drawEnding(&day);
+                        break;
+                    }
+
+                    //마지막 근무일(30)이 아니면
+                    if (day.day != 30) {
+                        //다음 날 시퀀스 작동
+                        nextDay(&day);
+                        //플랫폼 현황 화면 출력
+                        drawPlatformState(&day);
+                    }
+                    else {
+                        //게임 종료 시퀀스 작동
+                        drawEnding(&day);
+                        break;
+                    }
                 }
-                else {
-                    //게임 종료 시퀀스 작동
-                    drawEnding(&day);
-                    break;
-                }
+
+                //다음 승객 빼오기
+                passenger = dequeue(day.passengerQueue);
+                dialogue = dequeueDialogue(passenger->dialogue);
+                select = 0;
+            }
+            //ESC 입력 시
+            else if (key == KEY_ESC) {
+                drawPause(&isPlay);
             }
 
-            //다음 승객 빼오기
-            passenger = dequeue(day.passengerQueue);
-            dialogue = dequeueDialogue(passenger->dialogue);
-        }        
-        //ESC 입력 시
-        else if (key == KEY_ESC) {
-            drawPause(&isPlay);
-        }
-
-        //TAB 입력 시
-        else if (key == KEY_TAB) {
-            drawNormalTicketCheck();
+            //TAB 입력 시
+            else if (key == KEY_TAB) {
+                drawNormalTicketCheck();
+            }
         }
     }   
 }
@@ -445,6 +469,7 @@ void drawGame()
 void drawDayOver(Day day, int* isPlay) 
 {
     int state = 1;
+    int select = 1;
 
     while(state) {
 
@@ -471,7 +496,7 @@ void drawDayOver(Day day, int* isPlay)
         //첫날엔 아묻따 칭찬
         if (day.day == 1) {
             moveCursor(13, 43);
-            if (day.wrongPassenger < 0)
+            if (day.wrongPassenger <= 0)
                 printf("수고했네! 아주 잘 하고 있어");
             else
                 printf("뭐...첫날이니 그럴 수 있네!");
@@ -550,12 +575,15 @@ void drawDayOver(Day day, int* isPlay)
 
         //다음날 메시지 출력
         moveCursor(26, 48);
-        printf("\033[1;33m> %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
+        printf("\033[1;33m > %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
 
-        int key = _getch();
+        while (select) {
+            int key = _getch();
 
-        if (key == KEY_ENTER) {
-            state = 0;
+            if (key == KEY_ENTER) {
+                select = 0;
+                state = 0;
+            }
         }
     }
 }
@@ -581,21 +609,21 @@ void drawPause(int* isPlay)
     "종료",
     };
 
+    system("cls");
+
+    //PAUSE 타이틀 그리기
+    for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
+        printAsciiArtAtLocation(4 + i, 25, title[i]);
+    }
+
+    //안내 메시지
+    moveCursor(15, 37);
+    printf("\033[1;31m지금 종료하면 모든 진행 상황을 잃게됩니다!\033[0m");
+
+    //메뉴 박스 출력
+    drawBox(20, 50, 15, 6);
 
     while (isPause) {
-        system("cls");
-
-        //PAUSE 타이틀 그리기
-        for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
-            printAsciiArtAtLocation(4 + i, 25, title[i]);
-        }
-
-        //안내 메시지
-        moveCursor(15, 37);
-        printf("지금 종료하면 모든 진행 상황을 잃게됩니다!");
-
-        //메뉴 박스 출력
-        drawBox(20, 50, 15, 6);
 
         //메뉴 출력
         for (int i = 0; i < 2; ++i) {
@@ -607,6 +635,8 @@ void drawPause(int* isPlay)
             else
                 printf("   %s\n", menus[i]);
         }
+
+        moveCursor(23, 58);
 
         //플레이어 입력 받기
         int key = _getch();
@@ -647,75 +677,75 @@ void drawPlatformState(Day* day)
 {
     int state = 1;
     
+    //화면 초기화
+    system("cls");
+
+    //박스 그리기
+    drawBox(2, 0, 110, 20);
+
+    //플랫폼 현황판 타이틀 출력
+    moveCursor(5, 45);
+    printf("★ 플랫폼 별 노선도 ★");
+
+    //현재 플랫폼 출력
+    PlatformNode* current = day->platformList->link;
+    int index = 0;
+    do {
+        Platform* platform = current->data;
+
+        moveCursor(8 + index * 3, 14);
+        printf("%d번 플랫폼 : ", platform->num);
+        printStationList(platform->stationList);
+
+        current = current->link;
+        index++;
+    } while (current != day->platformList->link);
+
+    moveCursor(19, 14);
+    printf("\033[1;32m");
+    //1일째
+    if (day->day == 1) {
+        printf("우리역의 플랫폼 별 노선도네! 잘 숙지하는 게 좋을거야");
+    }
+    //2~3일째
+    else if (1 < day->day && day->day <= 3) {
+        printf("두 플랫폼의 역이 확장 되었네! 자네는 고생 좀 하겠어");
+    }
+    //7일째
+    else if (day->day == 7) {
+        printf("플랫폼 확장 공사를 했다네! 일이 더 힘들어지겠군");
+    }
+    //7~9일째
+    else if (7 < day->day && day->day <= 9) {
+        printf("두 플랫폼의 역이 확장 되었네! 역이 점점 성장하는군!");
+    }
+    //14일째
+    else if (day->day == 14) {
+        printf("플랫폼 확장 공사를 했다네! 이번이 마지막이니 걱정 말게나!");
+    }
+    //14~16일째
+    else if (14 < day->day && day->day <= 16) {
+        printf("새로운 플랫폼의 역이 확장 되었네! 조금 더 힘내주게");
+    }
+    //21일째
+    else if (day->day == 21) {
+        printf("플랫폼의 들어오는 열차가 서로 바뀌었네! 잘 확인해보게나");
+    }
+    //24일째
+    else if (day->day == 24) {
+        printf("플랫폼의 들어오는 열차가 다시 한번 바뀌었어! 실수하지 않도록 주의하게");
+    }
+    //30일째
+    else if (day->day == 30) {
+        printf("열차가 다시 바뀌었다지 뭔가... 끝까지 잘해보세!");
+    }
+    printf("\033[0m");
+
+    //다음날 메시지 출력
+    moveCursor(26, 48);
+    printf("\033[1;33m> 근무 시작\033[0m");
+
     while (state) {
-
-        //화면 초기화
-        system("cls");
-
-        //박스 그리기
-        drawBox(2, 0, 110, 20);
-
-        //플랫폼 현황판 타이틀 출력
-        moveCursor(5, 45);
-        printf("★ 플랫폼 별 노선도 ★");
-
-        //현재 플랫폼 출력
-        PlatformNode* current = day->platformList->link;
-        int index = 0;
-        do {
-            Platform* platform = current->data;
-
-            moveCursor(8 + index * 3, 14);
-            printf("%d번 플랫폼 : ", platform->num);
-            printStationList(platform->stationList);
-
-            current = current->link;
-            index++;
-        } while (current != day->platformList->link);
-
-        moveCursor(19, 14);
-        printf("\033[1;32m");
-        //1일째
-        if (day->day == 1) {
-            printf("우리역의 플랫폼 별 노선도네! 잘 숙지하는 게 좋을거야");
-        }
-        //2~3일째
-        else if (1 < day->day && day->day <= 3) {
-            printf("두 플랫폼의 역이 확장 되었네! 자네는 고생 좀 하겠어");
-        }
-        //7일째
-        else if (day->day == 7) {
-            printf("플랫폼 확장 공사를 했다네! 일이 더 힘들어지겠군");
-        }
-        //7~9일째
-        else if (7 < day->day && day->day <= 9) {
-            printf("두 플랫폼의 역이 확장 되었네! 역이 점점 성장하는군!");
-        }
-        //14일째
-        else if (day->day == 14) {
-            printf("플랫폼 확장 공사를 했다네! 이번이 마지막이니 걱정 말게나!");
-        }
-        //14~16일째
-        else if (14 < day->day && day->day <= 16) {
-            printf("새로운 플랫폼의 역이 확장 되었네! 조금 더 힘내주게");
-        }
-        //21일째
-        else if (day->day == 21) {
-            printf("플랫폼의 들어오는 열차가 서로 바뀌었네! 잘 확인해보게나");
-        }
-        //24일째
-        else if (day->day == 24) {
-            printf("플랫폼의 들어오는 열차가 다시 한번 바뀌었어! 실수하지 않도록 주의하게");
-        }
-        //30일째
-        else if (day->day == 30) {
-            printf("열차가 다시 바뀌었다지 뭔가... 끝까지 잘해보세!");
-        }
-        printf("\033[0m");
-
-        //다음날 메시지 출력
-        moveCursor(26, 48);
-        printf("\033[1;33m> 근무 시작\033[0m");
 
         int key = _getch();
 
@@ -730,53 +760,53 @@ void drawEnding(Day* day)
 {
     int state = 1;
 
+    system("cls");
+
+    //통계 박스 그리기
+    drawBox(2, 0, 110, 20);
+
+    //날짜 표시
+    moveCursor(5, 53);
+    printf("DAY %2d", day->day);
+
+    //찐 막 근무일이면
+    if (day->day == 30) {
+        moveCursor(7, 46);
+        printf("\033[1;32m★ 한 달 근무 결과 ★\033[0m");
+
+        moveCursor(14, 38);
+        if (day->totalGreatCount == 0 && day->totalWrongCount == 0) {
+            printf("완벽하게 승객을 응대했군! 아주 훌륭해!");
+        }
+        else if (day->totalWrongCount > 0 && (day->totalWrongCount - day->totalGreatCount < 4)) {
+            printf("이 정도면 완벽하진 않지만, 훌륭하네!");
+        }
+
+        moveCursor(16, 35);
+        printf("앞으로는 내 도움 없이도 잘할 수 있을 거야.");
+        moveCursor(18, 37);
+        printf("이제는 자네만의 선로를 개척해 보게나!");
+    }
+    //중간에 해고 당한 거면
+    else {
+        moveCursor(16, 35);
+        printf("자네 덕분에 고객과 소통할 기회가 많아졌군.");
+        moveCursor(18, 37);
+        printf("미안하지만 내일부터는 출근할 필요없네.");
+    }
+
+    moveCursor(9, 44);
+    printf("총 응대한 승객 수 : %2d", day->totalPassengerCount);
+    moveCursor(10, 44);
+    printf("잘못 응대한 승객 수 : %2d", day->totalWrongCount);
+    moveCursor(11, 42);
+    printf("훌륭하게 응대한 승객 수 : %2d", day->totalGreatCount);
+
+    //타이틀로 메시지 출력
+    moveCursor(26, 48);
+    printf("\033[1;33m> 타이틀로\033[0m");
+
     while (state) {
-
-        system("cls");
-
-        //통계 박스 그리기
-        drawBox(2, 0, 110, 20);
-
-        //날짜 표시
-        moveCursor(5, 53);
-        printf("DAY %2d", day->day);
-
-        //찐 막 근무일이면
-        if (day->day == 30) {
-            moveCursor(7, 46);
-            printf("\033[1;32m★ 한 달 근무 결과 ★\033[0m");
-
-            moveCursor(14, 38);
-            if (day->totalGreatCount == 0 && day->totalWrongCount == 0) {
-                printf("완벽하게 승객을 응대했군! 아주 훌륭해!");
-            }
-            else if (day->totalWrongCount > 0 && (day->totalWrongCount - day->totalGreatCount < 4)) {
-                printf("이 정도면 완벽하진 않지만, 훌륭하네!");
-            }
-
-            moveCursor(16, 35);
-            printf("앞으로는 내 도움 없이도 잘할 수 있을 거야.");
-            moveCursor(18, 37);
-            printf("이제는 자네만의 선로를 개척해 보게나!");
-        }
-        //중간에 해고 당한 거면
-        else {
-            moveCursor(16, 35);
-            printf("자네 덕분에 고객과 소통할 기회가 많아졌군.");
-            moveCursor(18, 37);
-            printf("미안하지만 내일부터는 출근할 필요없네.");
-        }
-
-        moveCursor(9, 44);
-        printf("총 응대한 승객 수 : %2d", day->totalPassengerCount);
-        moveCursor(10, 44);
-        printf("잘못 응대한 승객 수 : %2d", day->totalWrongCount);
-        moveCursor(11, 42);
-        printf("훌륭하게 응대한 승객 수 : %2d", day->totalGreatCount);
-
-        //타이틀로 메시지 출력
-        moveCursor(26, 48);
-        printf("\033[1;33m> 타이틀로\033[0m");
 
         int key = _getch();
 
@@ -791,6 +821,7 @@ void drawTutorial()
 {
     int isTutorial = 1;
     int selected = 0;
+    int select = 1;
     int duringPlatform = 0;
     int police = 0;
     int duringPolice = 0;
@@ -894,50 +925,59 @@ void drawTutorial()
             break;
         }
 
-        //선택지 출력
-        moveCursor(26, 0);
-        if (selected == 0)
-            printf("\033[01;33m > 1번 플랫폼\033[0m");
-        else
-            printf("   1번 플랫폼");
+        select = 1;
 
-        //경찰서 출력
-        if (police) {
-            moveCursor(28, 0);
-            if (selected > 0 || selected < 0)
-                printf("\033[01;31m > ☎  경찰서\033[0m");
+        while (select) {
+
+            //선택지 출력
+            moveCursor(26, 0);
+            if (selected == 0)
+                printf("\033[01;33m > 1번 플랫폼\033[0m");
             else
-                printf("   ☎  경찰서");
-        }
+                printf("   1번 플랫폼");
 
-        //플레이어 입력 받기
-        int key = _getch();
+            //경찰서 출력
+            if (police) {
+                moveCursor(28, 0);
+                if (selected > 0 || selected < 0)
+                    printf("\033[01;31m > ☎  경찰서\033[0m");
+                else
+                    printf("   ☎  경찰서");
+            }
+        
 
-        //방향기 좌우 입력 시
-        if (key == 0 || key == 224) {
-            key = _getch();
-            switch (key) {
-            case KEY_LEFT:
-            case KEY_RIGHT:
-                selected = 0;
-                break;
-            case KEY_UP:
-            case KEY_DOWN:
-                selected = selected > 0 ? 0 : 100;
-                break;
+            //플레이어 입력 받기
+            int key = _getch();
+
+            //방향기 좌우 입력 시
+            if (key == 0 || key == 224) {
+                key = _getch();
+                switch (key) {
+                case KEY_LEFT:
+                case KEY_RIGHT:
+                    selected = 0;
+                    break;
+                case KEY_UP:
+                case KEY_DOWN:
+                    if (!police) break;
+                    selected = selected > 0 ? 0 : 100;
+                    break;
+                }
             }
-        }
-        //엔터 입력 시
-        else if (key == KEY_ENTER) {
-            switch (selected) {
-            case 0: {
-                police = 1;
-                if (duringPolice) policeNotice = 1;
-                break;
-            }
-            default:
-                if (duringPolice) completePolice = 1;
-                break;
+            //엔터 입력 시
+            else if (key == KEY_ENTER) {
+                switch (selected) {
+                case 0: {
+                    police = 1;
+                    if (duringPolice) policeNotice = 1;
+                    break;
+                }
+                default:
+                    if (duringPolice) completePolice = 1;
+                    break;
+                }
+
+                select = 0;
             }
         }
     }
@@ -957,40 +997,40 @@ void drawInfo()
     "|_| \\_\\/_/   \\_\\___|_____|   |_| \\___/  /_/   \\_\\_| \\_| |_|     \\_/\\_/  |_| |_|_____|_| \\_\\_____|"
     };
 
-    while (info) {
-        system("cls");
+    system("cls");
 
-        drawBox(1, 0, 115, 30);
+    drawBox(1, 0, 115, 30);
 
-        //로고 타이틀 그리기
-        for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
-            printAsciiArtAtLocation(3 + i, 10, title[i]);
-        }
+    //로고 타이틀 그리기
+    for (int i = 0; i < sizeof(title) / sizeof(title[0]); ++i) {
+        printAsciiArtAtLocation(3 + i, 10, title[i]);
+    }
 
-        //게임 정보 출력
-        moveCursor(10, 2);
-        printf("================================================== \033[1;34m게임 정보\033[0m ====================================================");
+    //게임 정보 출력
+    moveCursor(10, 2);
+    printf("================================================== \033[1;34m게임 정보\033[0m ====================================================");
         
-        moveCursor(13, 37);
-        printf("당신은 한 기차역의 검표원으로 고용되었습니다!");
-        moveCursor(15, 16);
-        printf("당신의 주요 임무는 승객의 요구를 듣고 표를 검사하여 \033[1;31m알맞은 플랫폼\033[0m으로 안내하는 것입니다.");
-        moveCursor(17, 28);
-        printf("승객을 \033[1;31m이상한 플랫폼\033[0m으로 안내하면 일자리를 잃게될 수도 있습니다..");
-        moveCursor(19, 6);
-        printf("표 중에는 \033[1;31m위조표\033[0m도 있어, 주의하여야합니다! \033[1;32m위조표 종류 [ 철자 오류, 순서 불일치, 숫자 불일치, 그림 변화 ]\033[0m");
-        moveCursor(21, 39);
-        printf("\033[1m과연 실수없이 일자리를 지킬 수 있을까요?\033[0m");
+    moveCursor(13, 37);
+    printf("당신은 한 기차역의 검표원으로 고용되었습니다!");
+    moveCursor(15, 16);
+    printf("당신의 주요 임무는 승객의 요구를 듣고 표를 검사하여 \033[1;31m알맞은 플랫폼\033[0m으로 안내하는 것입니다.");
+    moveCursor(17, 28);
+    printf("승객을 \033[1;31m이상한 플랫폼\033[0m으로 안내하면 일자리를 잃게될 수도 있습니다..");
+    moveCursor(19, 6);
+    printf("표 중에는 \033[1;31m위조표\033[0m도 있어, 주의하여야합니다! \033[1;32m위조표 종류 [ 철자 오류, 순서 불일치, 숫자 불일치, 그림 변화 ]\033[0m");
+    moveCursor(21, 39);
+    printf("\033[1m\033[1;31m과\033[1;32m연 \033[1;33m실\033[1;34m수\033[1;35m없\033[1;36m이 \033[1;31m일\033[1;32m자\033[1;33m리\033[1;34m를 \033[1;35m지\033[1;36m킬 \033[1;31m수 \033[1;32m있\033[1;33m을\033[1;34m까\033[1;35m요\033[1;36m?\033[0m");
 
-        //조작법 출력
-        moveCursor(24, 2);
-        printf("================================================== \033[1;34m조작 방법\033[0m ====================================================");
-        moveCursor(27, 20);
-        printf("\033[1;32m[ ←, →, ↑, ↓ : 고르기 | Enter : 선택 | TAB : 정상표 확인 | ESC : 일시정지 ]\033[0m");
+    //조작법 출력
+    moveCursor(24, 2);
+    printf("================================================== \033[1;34m조작 방법\033[0m ====================================================");
+    moveCursor(27, 20);
+    printf("\033[1;32m[ ←, →, ↑, ↓ : 고르기 | Enter : 선택 | TAB : 정상표 확인 | ESC : 일시정지 ]\033[0m");
 
-        moveCursor(30, 39);
-        printf("\033[1m ESC를 누르면 메인 메뉴로 돌아갑니다. \033[0m");
+    moveCursor(30, 39);
+    printf("\033[1m ESC를 누르면 메인 메뉴로 돌아갑니다. \033[0m");
 
+    while (info) {
         int key = _getch();
         if (key == KEY_ESC) {
             info = 0;
@@ -1005,24 +1045,24 @@ void drawNormalTicketCheck()
 
     Ticket t = createTutTicket(0);
 
+    system("cls");
+
+    //제목
+    moveCursor(0, 2);
+    printf("\033[1;34m정상표 견본\033[0m");
+
+    //티켓 그리기
+    drawTicket(t, 0);
+
+    //돌아가기 안내
+    moveCursor(26, 0);
+    printf("\033[01;33m TAB 키를 눌러 돌아가기\033[0m");
+
     while (state) {
-
-        system("cls");
-
-        //제목
-        moveCursor(0, 2);
-        printf("\033[1;34m정상표 견본\033[0m");
-
-        //티켓 그리기
-        drawTicket(t, 0);
-
-        //돌아가기 안내
-        moveCursor(26, 0);
-        printf("\033[01;33m TAB 키를 눌러 돌아가기\033[0m");
 
         int key = _getch();
 
-        if (KEY_TAB) {
+        if (key == KEY_TAB) {
             state = 0;
         }
     }
