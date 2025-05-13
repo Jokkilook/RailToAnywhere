@@ -455,6 +455,7 @@ void drawGame()
             //ESC 입력 시
             else if (key == KEY_ESC) {
                 drawPause(&isPlay);
+                break;
             }
 
             //TAB 입력 시
