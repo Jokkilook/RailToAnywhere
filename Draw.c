@@ -460,6 +460,9 @@ void drawGame()
             //TAB 입력 시
             else if (key == KEY_TAB) {
                 drawNormalTicketCheck();
+                //날짜 표시
+                moveCursor(0, 2);
+                printf("\033[1;34mDAY %d\033[0m", day.day);
             }
         }
     }   
