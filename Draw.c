@@ -245,6 +245,7 @@ void drawGame()
             optionsSize = countPlatformList(day.platformList);
             moveCursor(26, 0);
             PlatformNode* p = day.platformList->link;
+
             do {
                 if (p->data->num - 1 == selected)
                     printf("\033[1;33m > %d번 플랫폼\033[0m", p->data->num);
@@ -464,6 +465,9 @@ void drawGame()
                 //날짜 표시
                 moveCursor(0, 2);
                 printf("\033[1;34mDAY %d\033[0m", day.day);
+                //정상표 확인 안내
+                moveCursor(0, 75);
+                printf("\033[1;32mTAB 키를 눌러 정상표 확인\033[0m");
             }
         }
     }   
