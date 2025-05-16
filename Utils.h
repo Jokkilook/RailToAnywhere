@@ -8,6 +8,7 @@ typedef struct Platform Platform;
 typedef struct Ticket Ticket;
 typedef struct Day Day;
 typedef struct DialogueQueue DialogueQueue;
+typedef struct FeedbackTree FeedbackTree;
 
 //커서 이동 함수
 void moveCursor(int row, int col);
@@ -71,3 +72,6 @@ DialogueQueue* createPassengerDialogue();
 
 //훌륭히 응대한 승객 판단 함수
 int checkFirstComplete(Passenger* passenger);
+
+//피드백 분기 결정
+FeedbackTree* selectFeeadback(FeedbackTree* root, int isGood);

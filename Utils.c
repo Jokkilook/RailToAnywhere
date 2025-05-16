@@ -31,8 +31,8 @@ Ticket* createTicket(Day* day)
 {
 	//티켓 메모리 할당
 	Ticket* t = (Ticket*)malloc(sizeof(Ticket));
-	//위조 티켓 확률 30%
-	t->isWrong = (rand() % 100 < 30) ? 1 : 0;
+	//위조 티켓 확률 날짜*2% 확률 ex) 20일째 = 40%, 30일째 = 60%
+	t->isWrong = (rand() % 100 < (day->day * 2)) ? 1 : 0;
 
 	//현재 플랫폼 리스트의 플랫폼의 역 리스트 중에서 하나 뽑기
 	t->destination = getRandomStation(day);
@@ -263,7 +263,7 @@ void nextDay(Day* day)
 	//30일째
 	else if (day->day == 30) {
 		//대기 승객 큐에 승객 채우기
-		fillPassengerQueue(day, 48);
+		fillPassengerQueue(day, 24);
 		//플랫폼 1,4 / 2,3 역 리스트 교환
 		exchangeStationListWithNum(day->platformList, 1, 4);
 		exchangeStationListWithNum(day->platformList, 2, 3);
@@ -345,6 +345,9 @@ void initDay(Day* day)
 	//기본 플랫폼 2개 추가
 	day->platformList = insertPlatformLast(day->platformList, p);
 	day->platformList = insertPlatformLast(day->platformList, p2);
+
+	//피드백 트리 초기화
+	day->feedback = initAndSetTree();
 }
 
 void killPassenger(Passenger* passenger)
@@ -479,4 +482,22 @@ int checkFirstComplete(Passenger* passenger)
 		}
 	}
 	return 0;
+}
+
+FeedbackTree* selectFeeadback(FeedbackTree* root, int isGood)
+{
+	FeedbackTree* temp;
+
+	if (isGood) {
+		temp = root->good;
+		pruneTree(root->bad);
+	}
+	else {
+		temp = root->bad;
+		pruneTree(root->good);
+	}
+
+	free(root);
+
+	return temp;
 }

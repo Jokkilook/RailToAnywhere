@@ -518,3 +518,60 @@ void printDialogueQueue(DialogueQueue* q) {
 		curr = curr->link;
 	}
 }
+
+FeedbackTree* createTreeNode(const char* data)
+{
+	FeedbackTree* node = (FeedbackTree*)malloc(sizeof(FeedbackTree));
+	node->data = data;
+	node->good = NULL;
+	node->bad = NULL;
+
+	return node;
+}
+
+FeedbackTree* initAndSetTree()
+{
+	FeedbackTree* root = (FeedbackTree*)malloc(sizeof(FeedbackTree));
+
+	FeedbackTree* g = createTreeNode(FeedbackList[0]);
+	FeedbackTree* b = createTreeNode(FeedbackList[1]);
+	FeedbackTree* gg = createTreeNode(FeedbackList[2]);
+	FeedbackTree* gb = createTreeNode(FeedbackList[5]);
+	FeedbackTree* ggg = createTreeNode(FeedbackList[3]);
+	FeedbackTree* ggb = createTreeNode(FeedbackList[4]);
+	FeedbackTree* gbg = createTreeNode(FeedbackList[6]);
+	FeedbackTree* gbb = createTreeNode(FeedbackList[7]);
+	FeedbackTree* bg = createTreeNode(FeedbackList[8]);
+	FeedbackTree* bb = createTreeNode(FeedbackList[11]);
+	FeedbackTree* bgg = createTreeNode(FeedbackList[9]);
+	FeedbackTree* bgb = createTreeNode(FeedbackList[10]);
+	FeedbackTree* bbg = createTreeNode(FeedbackList[12]);
+	FeedbackTree* bbb = createTreeNode(FeedbackList[13]);
+
+	root->data = "";
+	root->good = g;
+	root->bad = b;
+	g->good = gg;
+	g->bad = gb;
+	gg->good = ggg;
+	gg->bad = ggb;
+	gb->good = gbg;
+	gb->bad = gbb;
+	b->good = bg;
+	b->bad = bb;
+	bg->good = bgg;
+	bg->bad = bgb;
+	bb->good = bbg;
+	bb->bad = bbb;
+
+	return root;
+}
+
+void pruneTree(FeedbackTree* root)
+{
+	if (root) {
+		pruneTree(root->good);
+		pruneTree(root->bad);
+		free(root);
+	}
+}

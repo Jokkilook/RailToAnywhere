@@ -5,7 +5,7 @@
 //2. 큐 (연결 리스트) - 대기 승객 큐
 //3. 스택 (연결 리스트) - 플랫폼의 승객 스택, 역 데이터 스택
 //4. 원형 연결 리스트 - 플랫폼 리스트, 역 리스트
-//5. 트리 - 엔딩 분기 예정...
+//5. 트리 - 피드백 분기 - 후위순회 재귀함 수 사용
 
 //플레이어 입력값
 #define KEY_UP 72
@@ -24,6 +24,7 @@ typedef struct StationNode StationNode;
 typedef struct PlatformList PlatformList;
 typedef struct PlatformNode PlatformNode;
 typedef struct DialogueQueue DialogueQueue;
+typedef struct FeedbackTree FeedbackTree;
 
 //티켓 구조체
 typedef struct Ticket {
@@ -70,6 +71,8 @@ typedef struct Day {
 	PassengerQueue* passengerQueue;
 	//플랫폼 리스트
 	PlatformNode* platformList;
+	//피드백 트리
+	FeedbackTree* feedback;
 }Day;
 
 //승객 노드
@@ -207,6 +210,7 @@ void pushStation(StationStack* s, const char* data);
 //역 스택 요소 빼기 함수
 const char* popStation(StationStack* s);
 
+//다이얼로그 큐===========================================================================================
 //다이얼로그 노드
 typedef struct DialogueNode {
 	const char* data;
@@ -219,6 +223,12 @@ typedef struct DialogueQueue {
 }DialogueQueue;
 
 //큐는 malloc으로 초기 선언
+
+//피드백 트리=============================================================================================
+typedef struct FeedbackTree {
+	const char* data;
+	struct FeedbackTree*good, *bad;
+}FeedbackTree;
 
 //승객 큐 초기화 함수
 void initDialogueQueue(DialogueQueue* q);
@@ -235,8 +245,27 @@ const char* dequeueDialogue(DialogueQueue* q);
 //큐 출력 함수
 void printDialogueQueue(DialogueQueue* q);
 
-//데이터베이스
-static const char* paint[6] = {
+//트리노드 생성 함수
+FeedbackTree* createTreeNode(const char* data);
+
+//피드백 초기화 함수
+FeedbackTree* initAndSetTree();
+
+//재귀 후위 순회로 하위 트리 삭제 함수
+void pruneTree(FeedbackTree* root);
+
+//데이터베이스===========================================================================================
+//타이틀 아스키
+static const char* title[] = {
+" ____      _    ___ _       _____ ___       _    _   ___   ____        ___   _ _____ ____  _____ ",
+"|  _ \\    / \\  |_ _| |     |_   _/ _ \\     / \\  | \\ | \\ \\ / /\\ \\      / / | | | ____|  _ \\| ____|",
+"| |_) |  / _ \\  | || |       | || | | |   / _ \\ |  \\| |\\ V /  \\ \\ /\\ / /| |_| |  _| | |_) |  _|  ",
+"|  _ <  / ___ \\ | || |___    | || |_| |  / ___ \\| |\\  | | |    \\ V  V / |  _  | |___|  _ <| |___ ",
+"|_| \\_\\/_/   \\_\\___|_____|   |_| \\___/  /_/   \\_\\_| \\_| |_|     \\_/\\_/  |_| |_|_____|_| \\_\\_____|"
+};
+
+//타이틀 그림 아스키
+static const char* paint[] = {
 	"       _____                 . . . . . o o o o o",
 	"     __|[_]|__ ___________ _______    ____      o",
 	"    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
@@ -379,4 +408,21 @@ static const char* thirdDialogue[DIALOGUE_SIZE] = {
 	"%s이란 말이에요.",
 	"%s까지",
 	"마지막으로 말한다. %s",
+};
+
+static const char* FeedbackList[14] = {
+	"기대되는 신입이군. 훌륭하네.",
+	"음... 아직 갈 길이 멀어 보이지만, 신입이니까.",
+	"실력이 빠르게 느는군.",
+	"\033[1;33m<전설의 역무원>\033[0m 더 배울 게 없는 역무원이야.",
+	"\033[1;34m<초심을 잊지 말자>\033[0m 항상 초심을 잊지 말게나.",
+	"잘하더니 좀 삐끗하네? 주의하게.",
+	"\033[1;35m<되찾은 명예>\033[0m 역시 초반에 잘하더니 될성부른 떡잎이었구만.",
+	"\033[1;35m<초심자의 행운>\033[0m 가끔 신입 때의 자네가 그리워.",
+	"역시 하다보니 느는구만?",
+	"\033[1;34m<슬로우 스타터>\033[0m 입사했을 때는 좀 불안했는데, 아주 훌륭하구만.",
+	"\033[1;34m<희망?>\033[0m 실수에 자책하지 말게나. 내가 사람을 좀 볼 줄 아는데 자네는 희망이 있어!",
+	"전혀 진전이 없네.",
+	"\033[1;34m<새로운 희망>\033[0m 정말 다행이구만. 자네는 분명히 실력이 늘고있어.",
+	"\033[1;32m<외줄타기의 신>\033[0m 자네가 아슬아슬하게 해고는 안되는 게 신기하다네."
 };

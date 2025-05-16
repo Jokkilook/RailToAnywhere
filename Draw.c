@@ -80,25 +80,6 @@ void drawTicket(Ticket ticket, int highlight)
 //메인 메뉴 그리는 함수
 void drawMainMenu() 
 {
-    //타이틀 아스키
-    const char* title[] = {
-    " ____      _    ___ _       _____ ___       _    _   ___   ____        ___   _ _____ ____  _____ ",
-    "|  _ \\    / \\  |_ _| |     |_   _/ _ \\     / \\  | \\ | \\ \\ / /\\ \\      / / | | | ____|  _ \\| ____|",
-    "| |_) |  / _ \\  | || |       | || | | |   / _ \\ |  \\| |\\ V /  \\ \\ /\\ / /| |_| |  _| | |_) |  _|  ",
-    "|  _ <  / ___ \\ | || |___    | || |_| |  / ___ \\| |\\  | | |    \\ V  V / |  _  | |___|  _ <| |___ ",
-    "|_| \\_\\/_/   \\_\\___|_____|   |_| \\___/  /_/   \\_\\_| \\_| |_|     \\_/\\_/  |_| |_|_____|_| \\_\\_____|"
-    };
-
-    //타이틀 그림 아스키
-    const char* paint[] = {
-        "       _____                 . . . . . o o o o o",
-        "     __|[_]|__ ___________ _______    ____      o",
-        "    |[] [] []| [] [] [] [] [_____(__  ][]]_n_n__][.",
-        "   _|________|_[_________]_[________]_|__|________)<",
-        "     oo    oo 'oo      oo ' oo    oo 'oo 0000---oo\\_",
-        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    };
-
     const char* menus[] = {
     "게임 시작",
     "게임 정보",
@@ -213,6 +194,7 @@ void drawGame()
             drawTutorial();
             tutComplete = 1;
 
+            //튜토리얼 후 플랫폼 현황 한번 보여주기
             drawPlatformState(&day);
         }
 
@@ -267,19 +249,10 @@ void drawGame()
             else
                 printf("   ☎  경찰서");
 
-            //디버그 출력
+            //디버그 출력 -> 에서 ㄹㅇ 남은 승객 출력으로 변환
             moveCursor(0, 10);
             printf("남은 승객 : ");
             printQueue(day.passengerQueue);
-            //moveCursor(1, 10);
-            //printf("PQ ADDRESS: %p\n", (void*)day.passengerQueue);
-            //moveCursor(30, 0);
-            //printf("SELECTED : %d\n", selected);
-            //printf("1 : %d\n", day.platformList->link->data->num);
-            //printf("2 : %d\n", day.platformList->link->link->data->num);
-            //printf("3 : %d\n", day.platformList->link->link->link->data->num);
-            //printf("4 : %d\n", day.platformList->link->link->link->link->data->num);
-            //printPlatformList(day.platformList);
 
             //플레이어 입력 받기
             int key = _getch();
@@ -408,9 +381,6 @@ void drawGame()
                 //선택 초기화
                 selected = 0;
 
-                //선택 후 메시지 출력
-                //예정
-
                 //승객 큐가 비었으면
                 if (isEmptyQueue(day.passengerQueue)) {
                     //모든 플랫폼 별 승객 검사
@@ -419,6 +389,31 @@ void drawGame()
                     //승객 카운트
                     day.totalGreatCount += day.greatPassenger;
                     day.totalWrongCount += day.wrongPassenger;
+                                        
+                    //10, 20, 30일차에 피드백 분기 가르기
+                    if (day.day % 10 == 0) {
+                        //분기 조건
+                        int judge = 0;
+
+                        switch (day.day / 10) {
+                        case 1: {
+                            if (day.totalWrongCount < 5) judge = 1;
+                            break;
+                        }
+                        case 2: {
+                            if (day.totalWrongCount < 10) judge = 1;
+                            break;
+                        }
+                        case 3: {
+                            if (day.totalWrongCount < 15) judge = 1;
+                            break;
+                        }
+                        }
+
+                        //다음 분기 노드로 교체, 선택 못받은 쪽은 ★삭제★
+                        day.feedback = selectFeeadback(day.feedback, judge);
+                    }
+
                     if (day.day == 3) day.wrongDayCount = 0;
                     if (day.wrongPassenger > 0) day.wrongDayCount++;
                     else day.wrongDayCount = 0;
@@ -431,6 +426,7 @@ void drawGame()
                     //3일 연속 잘못 응대한 승객이 있으면 게임 종료
                     if (!(day.day == 1 || day.day == 2) && (day.wrongPassenger - day.greatPassenger > 3 || day.wrongDayCount >= 3)) {
                         drawEnding(&day);
+                        isPlay = 0;
                         break;
                     }
 
@@ -444,6 +440,7 @@ void drawGame()
                     else {
                         //게임 종료 시퀀스 작동
                         drawEnding(&day);
+                        isPlay = 0;
                         break;
                     }
                 }
@@ -478,6 +475,7 @@ void drawDayOver(Day day, int* isPlay)
 {
     int state = 1;
     int select = 1;
+    int fire = 0;
 
     while(state) {
 
@@ -527,6 +525,7 @@ void drawDayOver(Day day, int* isPlay)
             printf("시간 낭비한 손님이 몇명인가!!");
             moveCursor(15, 49);
             printf("\033[1;31m자넨 해고야!\033[0m");
+            fire = 1;
         }
         //연속 3일 잘못 응대가 있으면 해고 통지
         else if (!(day.day == 1 || day.day == 2) && day.wrongDayCount >= 3) {
@@ -534,6 +533,7 @@ void drawDayOver(Day day, int* isPlay)
             printf("3일 연속 실수라니!!");
             moveCursor(15, 49);
             printf("\033[1;31m자넨 해고야!\033[0m");
+            fire = 1;
         }
         //해고 통지 이외의 평가
         else {
@@ -581,9 +581,30 @@ void drawDayOver(Day day, int* isPlay)
             }
         }
 
+        //10, 20, 30일 차에 평가 박스 출력
+        if (day.day % 10 == 0) {
+            //평가 박스 그리기
+            drawBox(20, 0, 110, 5);
+            moveCursor(22, 4);
+            
+            switch (day.day / 10) {
+            case 1:
+                printf("\033[1;31m초기 평가\033[0m : %s", day.feedback->data);
+                break;
+
+            case 2:
+                printf("\033[1;33m중간 평가\033[0m : %s", day.feedback->data);
+                break;
+
+            case 3:
+                printf("\033[1;32m최종 평가\033[0m : %s", day.feedback->data);
+                break;
+            }
+        }
+
         //다음날 메시지 출력
         moveCursor(26, 48);
-        printf("\033[1;33m > %s\033[0m", day.wrongPassenger - day.greatPassenger >= 3 ? "타이틀로" : "다음날로");
+        printf("\033[1;33m > %s\033[0m", fire ? "타이틀로" : "다음날로");
 
         while (select) {
             int key = _getch();
@@ -693,7 +714,7 @@ void drawPlatformState(Day* day)
 
     //플랫폼 현황판 타이틀 출력
     moveCursor(5, 45);
-    printf("★ 플랫폼 별 노선도 ★");
+    printf("★ 플랫폼 별 노선도 ★ ");
 
     //현재 플랫폼 출력
     PlatformNode* current = day->platformList->link;
@@ -780,7 +801,7 @@ void drawEnding(Day* day)
     //찐 막 근무일이면
     if (day->day == 30) {
         moveCursor(7, 46);
-        printf("\033[1;32m★ 한 달 근무 결과 ★\033[0m");
+        printf("\033[1;32m★ 한 달 근무 결과 ★ \033[0m");
 
         moveCursor(14, 38);
         if (day->totalGreatCount == 0 && day->totalWrongCount == 0) {
