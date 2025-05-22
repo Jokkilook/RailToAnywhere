@@ -465,6 +465,7 @@ void drawGame()
                 //정상표 확인 안내
                 moveCursor(0, 75);
                 printf("\033[1;32mTAB 키를 눌러 정상표 확인\033[0m");
+                select = 0;
             }
         }
     }   
